@@ -1,10 +1,110 @@
 #' Gather independent seeds.
+#' @param x number of seeds, or an object with seeds to gather
+#' @param ... passed on
+#' @param .starting if TRUE starting seeds with be gathered rather than ending seeds.
 #'
-#' Equivalant to \code{\link[rsprng]{spawn.new.sprng}}
+#' Equivalant to \code{\link[rsprng]{spawn.new.sprng}} when x is a number.
 #' 
-#' @importFrom rsprng
+#' @importFrom rsprng spawn.new.sprng
 #' @export
-gather.seeds <- 
-function(n, seed, ...){
-	spawn.new.sprng(n, seed)
+gather <- 
+function(x, ..., .starting=F){
+  if(is.list(x)){
+    seeds <- lapply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
+    if(any(sapply(seeds, is.null)))
+      stop("Malformed list.")
+  } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
+    as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
+  } else {
+    stop("x must be either a list or integer")
+  }
 }
+
+#' @rdname seed-funs
+#' @details
+#' \code{withpseed} is the same as withseed, but assumes a parallel seed from 
+#' \code{\link[rsprng]{spawn.sprng}}.  When evaluated the beginning and endind seeds are
+#' saved in the attributes "starting.seed" and "ending.seed", for continued evaluation with 
+#' \code{\link{harvest}}
+#' 
+#' @importFrom rsprng unpack.sprng free.sprng pack.sprng
+#' @export
+withpseed <- function(seed, expr, envir=parent.frame()){
+  oldseed <- get.seed()
+  RNGkind("user")
+  unpack.sprng(seed)
+  on.exit(free.sprng())
+  on.exit(replace.seed(oldseed), add=T)
+  fun <- if(is.function(expr)){
+    stopifnot(is.null(formals(expr)))
+    expr
+  } else {
+    eval(substitute(function()expr), envir=envir)
+  }
+  structure(fun(),
+    starting.seed = seed,
+    ending.seed   = pack.sprng())
+}
+
+#' Evaluate an expression for a set of seeds
+#' @param seeds a list of seeds can be obtained though \code{\link{gather}}
+#' @param expr an expression to evalutate with the different seeds.
+#' @param envir an environment within which to evaluate \code{expr}.
+#' @param .parallel should the computations be run in parallel?
+#' 
+#' @importFrom plyr llply
+#' @export
+farm <-
+function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
+  fun <- if(is.function(expr)){
+    stopifnot(is.null(formals(expr)))
+    expr
+  } else {
+    eval(substitute(function()expr), envir=envir)
+  }
+  llply(seeds, withpseed, fun, envir=environment(), .parallel=.parallel)
+}
+
+
+#' Harvest results
+#' @param .list a list of \code{data.frame}s  See details.
+#' @param fun a function to apply
+#' @param ... passed to \code{fun}
+#' @param .parallel should the computations be run in parallel?
+#' 
+#' @details
+#' harvest is functionaly equivalant to llply, but takes on additional capability when used
+#' with the other functions from this package.  When an object comes from \code{\link{withpseed}}
+#' the ending seed is extacted and used to continue evaluation.
+#' 
+#' @importFrom plyr mlply
+#' @export
+harvest <-
+function(.list, fun, ..., .parallel=F){
+  seeds <- llply(.list, attr, 'ending.seed')
+  if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
+    seeds <- replicate(length(.list), NULL, simplify="list")
+  d<-data.frame(._id_ = seq_len(length(seeds)))
+  d$seed <- seeds
+  d$data <- .list
+  f1 <- function(._id_, seed, data, dotargs=list()){
+    f2 <- function(){do.call(fun,append(list(data[[1L]]),dotargs))}
+    withpseed(seed=seed[[1L]], f2)
+  }
+  dotargs <- list(...)
+  mlply(d, f1, dotargs=dotargs, .parallel=.parallel)
+}
+
+#' Strip attributes
+#' @param x, any object
+#' @export
+noattr <- noattributes <- function(x){
+  if(is.list(x)){
+    x <- llply(x, noattributes)
+  }
+  attributes(x) <- NULL
+  x
+}
+
+
+

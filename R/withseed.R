@@ -16,22 +16,11 @@ withseed <- function(seed, expr, envir=parent.frame()){
   oldseed <- get.seed()
   on.exit(replace.seed(oldseed))
   set.seed(seed)
-  eval(substitute(expr), envir=envir)
+  structure(eval(substitute(expr), envir=envir),
+    starting.seed = seed,
+    ending.seed   = .Random.seed)
 }
 
-#' @rdname seed-funs
-#' @details
-#' \code{withpseed} is the same as withseed, but assumes a parallel seed from 
-#' \code{\link[rsprng]{spawn.sprng}}
-#' @export
-withpseed <- function(seed, expr, envir=parent.frame()){
-  stopifnot(require("rsprng"))
-  oldseed <- get.seed()
-  on.exit(free.sprng())
-  on.exit(replace.seed(oldseed), add=T)
-  unpack.sprng(seed)
-  eval(substitute(expr), envir=envir)
-}
 
 #' safe version of retrieving the .Random.seed
 #' @rdname seed-funs
