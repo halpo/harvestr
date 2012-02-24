@@ -4,6 +4,17 @@ Title: What the package does (short line)
 Version: 1.0
 Date: 2012-02-23
 Author: Andrew Redd
-Maintainer: Andrew Redd <andrew.redd2hsc.utah.edu>
+Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy simulation and replicability.
 License: MIT
+Imports:
+    rsprng (>= 1.0),
+    plyr
+Suggests:
+    testthat,
+    dosim,
+    doMC,
+    foreach
+Collate:
+    'gather.R'
+    'withseed.R'

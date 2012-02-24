@@ -46,6 +46,21 @@ withpseed <- function(seed, expr, envir=parent.frame()){
     ending.seed   = pack.sprng())
 }
 
+#' call an object continuing the random number stream.
+#' @param x an object
+#' @param fun a function to call on object
+#' @param ... passed onto function
+#' 
+#' @seealso \code{\link{withpseed}}, \code{\link{harvest}}, and \code{\link{with}}
+#' @export
+reap <-
+function(x, fun, ...){
+  seed <- attr(x, "ending.seed")
+  if(is.null(seed))
+    stop("Could not find a seed value associated with x")
+  withpseed(seed, fun(x,...))
+}
+
 #' Evaluate an expression for a set of seeds
 #' @param seeds a list of seeds can be obtained though \code{\link{gather}}
 #' @param expr an expression to evalutate with the different seeds.
@@ -81,18 +96,19 @@ function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
 #' @export
 harvest <-
 function(.list, fun, ..., .parallel=F){
-  seeds <- llply(.list, attr, 'ending.seed')
-  if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
-    seeds <- replicate(length(.list), NULL, simplify="list")
-  d<-data.frame(._id_ = seq_len(length(seeds)))
-  d$seed <- seeds
-  d$data <- .list
-  f1 <- function(._id_, seed, data, dotargs=list()){
-    f2 <- function(){do.call(fun,append(list(data[[1L]]),dotargs))}
-    withpseed(seed=seed[[1L]], f2)
-  }
-  dotargs <- list(...)
-  mlply(d, f1, dotargs=dotargs, .parallel=.parallel)
+  llply(.list, reap, fun, ..., .parallel=.parallel)
+  # seeds <- llply(.list, attr, 'ending.seed')
+  # if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
+    # seeds <- replicate(length(.list), NULL, simplify="list")
+  # d<-data.frame(._id_ = seq_len(length(seeds)))
+  # d$seed <- seeds
+  # d$data <- .list
+  # f1 <- function(._id_, seed, data, dotargs=list()){
+    # f2 <- function(){do.call(fun,append(list(data[[1L]]),dotargs))}
+    # withpseed(seed=seed[[1L]], f2)
+  # }
+  # dotargs <- list(...)
+  # mlply(d, f1, dotargs=dotargs, .parallel=.parallel)
 }
 
 #' Strip attributes
