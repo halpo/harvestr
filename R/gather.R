@@ -10,7 +10,7 @@
 gather <- 
 function(x, ..., .starting=F){
   if(is.list(x)){
-    seeds <- lapply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
+    seeds <- llply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
     if(any(sapply(seeds, is.null)))
       stop("Malformed list.")
   } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
@@ -81,9 +81,13 @@ function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
 #' @export
 harvest <-
 function(.list, fun, ..., .parallel=F){
-  seeds <- llply(.list, attr, 'ending.seed')
-  if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
-    seeds <- replicate(length(.list), NULL, simplify="list")
+  seeds <- try(gather(.list))
+  if((class(seeds) == "try-error") || 
+     any(sapply(seeds, is.null)) || 
+     length(seeds) != length(.list)) {
+    warning("Could not gather seeds from the given .list.  Generating new seeds.")
+    seeds <- gather(length(.list))
+  }
   d<-data.frame(._id_ = seq_len(length(seeds)))
   d$seed <- seeds
   d$data <- .list
