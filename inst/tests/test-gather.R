@@ -1,39 +1,53 @@
+library(dosim)
+library(testthat)
+library(plyr)
 
-suppressWarnings(suppressMessages({
-seeds  <- gather(10, seed=1234)
-seeds0 <- gather(10, seed=1234)
-}))
-isTRUE(all.equal(seeds, seeds0))
+test_that("testing",{
+message("Ignore printedwarnings they are expected, and impossible to supress.")
+context("gather")
+  suppressWarnings(suppressMessages({
+  seeds  <- gather(10, seed=1234)
+  seeds0 <- gather(10, seed=1234)
+  }))
+  expect_identical(seeds, seeds0)
 
-seed <- seeds[[1]]
-
-a <- noattr(withpseed(seed, rnorm(10)))
-b <- noattr(withpseed(seed, rnorm(10)))
-c <- rnorm(10)
-isTRUE(all.equal(a,b))
-isTRUE(all.equal(a,c))  # FALSE
-
-a <- farm(seeds, rnorm(10))
-b <- farm(seeds, rnorm(10))
-isTRUE(all.equal(a,b))
-
-x <- harvest(a, sample, replace=T)
-y <- harvest(a, sample, replace=T)
-identical(x,y)
+context("withpseed")
+  seed <- seeds[[1]]
+  noattr(a <- withpseed(seed, rnorm(10)))
+  noattr(b <- withpseed(seed, rnorm(10)))
+  c <- rnorm(10)
+  expect_identical(a, b)
+  expect_false(identical(a, c))  # FALSE
 
 
-# test parallel
-require(doMC)
-registerDoMC()
-z <- harvest(a, sample, replace=T, .parallel=T)
-identical(x,z)
+context("farm")
+  e <- farm(seeds, rnorm(10))
+  f <- farm(seeds, rnorm(10))
+  expect_identical(e,f)
 
-# test parallel
-r <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000))
-s <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000), .parallel=T)
-all(laply(r, identical, r[[1]]))
-all(laply(s, identical, s[[1]]))
+context("reap")
+  expect_identical(reap(a, sample), reap(a, sample))
 
-# test with use
+context("harvest")
+  x <- harvest(e, sample, replace=T)
+  y <- harvest(e, sample, replace=T)
+  expect_identical(x,y)
 
+context("parallel")
+  if(require(doMC)) {
+    registerDoMC()
+    r <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000))
+    s <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000), .parallel=T)
+    expect_true(all(laply(r, identical, r[[1]])))
+    expect_true(all(laply(s, identical, s[[1]])))
+    z <- harvest(e, sample, replace=T, .parallel=T)
+    expect_identical(x,z)
+  }
 
+context("using with")
+  data <- farm(gather(3, seed=1234), data.frame(x123=runif(100), y456=rnorm(100)))
+  m1 <- harvest(data, with, mean(x123))
+  m2 <- lapply(data, with, mean(x123))
+  expect_equivalent(noattr(m1), noattr(m2))
+
+})
