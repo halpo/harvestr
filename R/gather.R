@@ -14,7 +14,9 @@ function(x, ..., .starting=F){
     if(any(sapply(seeds, is.null)))
       stop("Malformed list.")
   } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
-    as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
+    seeds <- as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
+    seeds <- llply(seeds, structure, class='pseed')
+    seeds
   } else {
     stop("x must be either a list or integer")
   }
@@ -43,7 +45,7 @@ withpseed <- function(seed, expr, envir=parent.frame()){
   }
   structure(fun(),
     starting.seed = seed,
-    ending.seed   = pack.sprng())
+    ending.seed   = structure(pack.sprng(), class=pseed))
 }
 
 #' call an object continuing the random number stream.
@@ -97,18 +99,6 @@ function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
 harvest <-
 function(.list, fun, ..., .parallel=F){
   llply(.list, reap, fun, ..., .parallel=.parallel)
-  # seeds <- llply(.list, attr, 'ending.seed')
-  # if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
-    # seeds <- replicate(length(.list), NULL, simplify="list")
-  # d<-data.frame(._id_ = seq_len(length(seeds)))
-  # d$seed <- seeds
-  # d$data <- .list
-  # f1 <- function(._id_, seed, data, dotargs=list()){
-    # f2 <- function(){do.call(fun,append(list(data[[1L]]),dotargs))}
-    # withpseed(seed=seed[[1L]], f2)
-  # }
-  # dotargs <- list(...)
-  # mlply(d, f1, dotargs=dotargs, .parallel=.parallel)
 }
 
 #' Strip attributes
@@ -122,5 +112,10 @@ noattr <- noattributes <- function(x){
   x
 }
 
-
-
+#' @S3method print pseed
+#' @importFrom digest digest
+print.pseed <- 
+function(x, ...){
+  cat(sprintf("<sprng parallel seed: MD5=%s>", digest(x)), ...)
+  invisible(x)
+}
