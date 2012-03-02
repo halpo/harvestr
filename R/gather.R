@@ -97,18 +97,6 @@ function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
 harvest <-
 function(.list, fun, ..., .parallel=F){
   llply(.list, reap, fun, ..., .parallel=.parallel)
-  # seeds <- llply(.list, attr, 'ending.seed')
-  # if(any(sapply(seeds, is.null)) || length(seeds) != length(.list))
-    # seeds <- replicate(length(.list), NULL, simplify="list")
-  # d<-data.frame(._id_ = seq_len(length(seeds)))
-  # d$seed <- seeds
-  # d$data <- .list
-  # f1 <- function(._id_, seed, data, dotargs=list()){
-    # f2 <- function(){do.call(fun,append(list(data[[1L]]),dotargs))}
-    # withpseed(seed=seed[[1L]], f2)
-  # }
-  # dotargs <- list(...)
-  # mlply(d, f1, dotargs=dotargs, .parallel=.parallel)
 }
 
 #' Strip attributes
@@ -122,5 +110,22 @@ noattr <- noattributes <- function(x){
   x
 }
 
-
+#' Plant elements with seeds
+#' @param .list a list to set seeds on
+#' @param ... passed to \code{\link{gather}}
+#'
+#' For each element in list set an in dependent random seed.
+#' This will replace and ending seeds values already set for the objects in the list.
+#' 
+#' @export
+plant <-
+function(.list, ...){
+  stopifnot(is.list(.list))
+  n<-length(.list)
+  seeds <- gather(n, ...)
+  for(i in seq_len(n)){
+    attr(.list[[i]],'ending.seed') <- seeds[[i]]
+  }
+  return(.list)
+}
 
