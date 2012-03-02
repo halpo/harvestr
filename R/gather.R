@@ -14,7 +14,9 @@ function(x, ..., .starting=F){
     if(any(sapply(seeds, is.null)))
       stop("Malformed list.")
   } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
-    as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
+    seeds <- as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
+    seeds <- llply(seeds, structure, class='pseed')
+    seeds
   } else {
     stop("x must be either a list or integer")
   }
@@ -43,7 +45,7 @@ withpseed <- function(seed, expr, envir=parent.frame()){
   }
   structure(fun(),
     starting.seed = seed,
-    ending.seed   = pack.sprng())
+    ending.seed   = structure(pack.sprng(), class=pseed))
 }
 
 #' call an object continuing the random number stream.
@@ -108,6 +110,14 @@ noattr <- noattributes <- function(x){
   }
   attributes(x) <- NULL
   x
+}
+
+#' @S3method print pseed
+#' @importFrom digest digest
+print.pseed <- 
+function(x, ...){
+  cat(sprintf("<sprng parallel seed: MD5=%s>", digest(x)), ...)
+  invisible(x)
 }
 
 #' Plant elements with seeds
