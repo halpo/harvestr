@@ -1,6 +1,6 @@
 Package: dosim
 Type: Package
-Title: What the package does (short line)
+Title: A Parallel Simulation Framework
 Version: 1.0
 Date: 2012-02-23
 Author: Andrew Redd
@@ -18,3 +18,4 @@ Suggests:
 Collate:
     'gather.R'
     'withseed.R'
+    'dosim-package.R'
