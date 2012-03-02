@@ -45,7 +45,7 @@ withpseed <- function(seed, expr, envir=parent.frame()){
   }
   structure(fun(),
     starting.seed = seed,
-    ending.seed   = structure(pack.sprng(), class=pseed))
+    ending.seed   = structure(pack.sprng(), class="pseed"))
 }
 
 #' call an object continuing the random number stream.
