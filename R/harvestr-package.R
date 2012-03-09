@@ -1,9 +1,10 @@
-#' \code{dosim} package
-#' @name package-dosim
+#' \code{harvestr} package
+#' @name package-harvestr
+#' @aliases harvestr
 #' @title Simulation framework
 #' @author Andrew Redd <amredd_at_gmail.com>
 #' 
-#' The dosim package is a framework for parallel replicable simulations based off the package
+#' The harvestr package is a framework for parallel replicable simulations based off the package
 #' \code{\link[rsprng:spawn.new.sprng]{rsprng}}.
 #' The functions to know about are:
 #' \enumerate{

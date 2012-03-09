@@ -1,0 +1,12 @@
+harvestr 0.1
+------------
+
+harvestr is a package that facilitates the creation
+of reproducible parallel simulations.  
+
+The primary functions are:
+
+  * `gather` for generating parallel seeds.
+  * `farm` for generating datasets from the paralele seeds.
+  * `harvest` for applying an analysis function for each generated data frame,
+    including stochastic analysis such as bootstrap or mcmc.
