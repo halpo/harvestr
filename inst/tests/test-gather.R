@@ -34,8 +34,8 @@ context("harvest")
   expect_identical(x,y)
 
 context("parallel")
-  if(require(doMC)) {
-    registerDoMC()
+  if(require(doParallel)) {
+    registerDoParallel()
     r <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000))
     s <- llply(replicate(100, seed, simplify=F), withpseed, function()rnorm(10000), .parallel=T)
     expect_true(all(laply(r, identical, r[[1]])))

@@ -1,4 +1,4 @@
-Package: dosim
+Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
 Version: 1.0
@@ -13,8 +13,8 @@ Imports:
     digest
 Suggests:
     testthat,
-    dosim,
-    doMC,
+    dostats,
+    doParallel,
     foreach
 Collate:
     'gather.R'
