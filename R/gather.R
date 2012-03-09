@@ -122,17 +122,17 @@ function(x, ...){
 
 #' Plant elements with seeds
 #' @param .list a list to set seeds on
-#' @param ... passed to \code{\link{gather}}
+#' @param seeds to plant from \code{\link{gather}}
 #'
 #' For each element in list set an in dependent random seed.
 #' This will replace and ending seeds values already set for the objects in the list.
 #' 
 #' @export
 plant <-
-function(.list, ...){
+function(.list, seeds=gather(length(.list))){
   stopifnot(is.list(.list))
-  n<-length(.list)
-  seeds <- gather(n, ...)
+  n <- length(.list)
+  stopifnot(n == length(seeds))
   for(i in seq_len(n)){
     attr(.list[[i]],'ending.seed') <- seeds[[i]]
   }
