@@ -1,5 +1,5 @@
-# The `dosim` Parallel Simulation Framework.
-The `dosim` package is a framework for conducting replicable parallel simulations in [R](http://www.r-project.org).  It builds off the [rsprng](http://cran.r-project.org/?package=rsprng) parallel random number generator, and the popular [plyr](http://cran.r-project.org/?pacakge=plyr) package for split apply combine framework.
+# The `harvestr` Parallel Simulation Framework.
+The `harvestr` package is a framework for conducting replicable parallel simulations in [R](http://www.r-project.org).  It builds off the [rsprng](http://cran.r-project.org/?package=rsprng) parallel random number generator, and the popular [plyr](http://cran.r-project.org/?pacakge=plyr) package for split apply combine framework.
 
 Due to the replicable simulations being based off seed values,this package takes a theme of seeds and farming.  The principal functions are as follows:
 
@@ -23,7 +23,7 @@ regiserDoMC()
 See the `plyr` and `foreach` packages documentation for what backends are currently supported.
 
 ## Operating Systems ##
-`dosim` is limited in it's capabilities by the packages that it depends on.  Currently, rsprng does not compile on Macs.  The Parallel backends are also platform limited read the individual packages documentation:
+`harvestr` is limited in it's capabilities by the packages that it depends on.  Currently, rsprng does not compile on Macs.  The Parallel backends are also platform limited read the individual packages documentation:
  
   * [doMC](http://cran.r-project.org/?package=doMC)
   * [doSMP](http://cran.r-project.org/?package=doSMP)
