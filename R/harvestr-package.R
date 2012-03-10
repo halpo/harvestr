@@ -1,10 +1,11 @@
 #' \code{harvestr} package
-#' @name package-harvestr
-#' @aliases harvestr
-#' @title Simulation framework
+#' @name harvestr
+#' @docType package
+#' @aliases harvestr package-harvestr
+#' @title A Simple Reproducible Parallel Simulation Framework
 #' @author Andrew Redd <amredd_at_gmail.com>
 #' 
-#' The harvestr package is a framework for parallel replicable simulations based off the package
+#' The harvestr package is a framework for parallel reproducible simulations based off the package
 #' \code{\link[rsprng:spawn.new.sprng]{rsprng}}.
 #' The functions to know about are:
 #' \enumerate{
