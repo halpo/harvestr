@@ -6,7 +6,7 @@ Date: 2012-03-10
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy simulation and replicability.
-License: MIT
+License: GPL(>= 2)
 Imports:
     rsprng (>= 1.0),
     plyr,

@@ -1,1 +1,4 @@
-testthat::test_package("dosim")
+library(testthat)
+library(harvestr)
+
+test_package("harvestr")
