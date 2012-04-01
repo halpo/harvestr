@@ -3,7 +3,7 @@ library(testthat)
 library(plyr)
 
 test_that("testing",{
-message("Ignore printedwarnings they are expected, and impossible to supress.")
+message("Ignore printed warnings they are expected, and impossible to supress.")
 { context("gather")
   suppressWarnings(suppressMessages({
     seeds  <- gather(10, seed=1234)
@@ -23,6 +23,10 @@ message("Ignore printedwarnings they are expected, and impossible to supress.")
   e <- farm(seeds, rnorm(10))
   f <- farm(seeds, rnorm(10))
   expect_equivalent(e,f)
+  
+  o <- sample(seq_along(seeds))
+  g <- farm(seeds[o], rnorm(10))[order(o)]
+  expect_equivalent(e,g)
 }
 { context("reap")
   expect_equivalent(reap(a, sample), reap(a, sample))
@@ -30,12 +34,12 @@ message("Ignore printedwarnings they are expected, and impossible to supress.")
 { context("harvest")
   x <- harvest(e, sample, replace=T)
   y <- harvest(e, sample, replace=T)
-  expect_identical(x,y)
+  expect_equivalent(x,y)
 }
 { context("using with")
   data <- farm(gather(3, seed=1234), data.frame(x123=runif(100), y456=rnorm(100)))
   m1 <- harvest(data, with, mean(x123))
   m2 <- lapply(data, with, mean(x123))
-  expect_equivalent(noattr(m1), noattr(m2))
+  expect_equivalent(m1, m2)
 }
 })
