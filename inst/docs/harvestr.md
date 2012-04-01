@@ -1,8 +1,13 @@
 # Using `harvestr` for replicable simulations
+
 ```knitr global-setup, echo=F, results='hide', message=F, warning=F
 render_gfm()
 library(markdown)
+print.data.frame <- function(x, ...){
+  print(ascii(df, include.rownames = FALSE), type = 'rest')
+}
 ```
+
 ## Introduction
 The `harvestr` package is a new approach to simulation studies that facilitates 
 parallel execution.  It builds off the structures available in the `plyr`, `foreach`
@@ -43,12 +48,16 @@ Some learn best by example.  Here I will show a simple example for the basic
 process.  Here we will perform simple linear regression for 100 data sets.
 First off we gather the seeds.  This step is separate to facilitate storing
 the seeds to be distributed along with research if necessary.
+
 ```knitr ex1-setup
 library(harvestr)
 library(plyr)
+library(dostats)
 seeds <- gather(100, seed=12345)
 ```
+
 Second, we generate the data.
+
 ```knitr ex1-generate_data
 datasets <- farm(seeds, {
   x <- rnorm(100)
@@ -56,17 +65,25 @@ datasets <- farm(seeds, {
   data.frame(y,x)
 })
 ```
+
 Then we analyze the data.
+
 ```kntir ex1-analysis
 analyses <-  harvest(datasets, lm)
 ```
+
 So what do we have in `analyses`?  We have whatever `lm` returned.  In this 
 case we have a list of `lm` objects containg the results of a linear regression.
 Ussually we will want to do more to summarize the results.
+
 ```knitr ex1-summarize, results='hide'
 coefs <- t(sapply(analyses, coef))
 adply(coefs,2, dostats, mean, sd)
 ```
 
+## Example 2 - Stochastic Analysis
 
+That is very nice, but rather simple as far ananalyses go.  What might be more interesting is to
+perform an analysis with a random component to the analysis. 
 
+## Example 3 - Caching

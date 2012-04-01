@@ -1,5 +1,5 @@
 #' Do a computation with a given seed.
-#' @rdname seed-funs
+#' @rdname seed_funs
 #' @param seed  a valid seed value
 #' @param expr expression to evaluate.
 #' @param envir the \code{\link{environment}} to evaluate the code in. 
@@ -23,7 +23,7 @@ withseed <- function(seed, expr, envir=parent.frame()){
 
 
 #' safe version of retrieving the .Random.seed
-#' @rdname seed-funs
+#' @rdname seed_funs
 #' @return the .Random.seed if defined, otherwise NULL
 #' @export
 get.seed <- function(){
@@ -35,7 +35,7 @@ get.seed <- function(){
   seed
 }
 
-#' @rdname seed-funs
+#' @rdname seed_funs
 #' @param delete logical to delete if \code{seed} is null.
 #' @details 
 #' Replaces the .Random.seed with seed unless seed is null, then it will 
@@ -50,7 +50,7 @@ replace.seed <- function(seed, delete=TRUE){
 }
 
 #' Get or Set Current Seed - Safe Version
-#' @rdname seed-funs
+#' @rdname seed_funs
 #' 
 #' @details
 #' Always returns a valid seed. 

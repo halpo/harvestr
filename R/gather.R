@@ -6,6 +6,7 @@
 #' Equivalant to \code{\link[rsprng]{spawn.new.sprng}} when x is a number.
 #' 
 #' @importFrom rsprng spawn.new.sprng
+#' @include withseed.R
 #' @export
 gather <- 
 function(x, ..., .starting=F){
@@ -22,7 +23,7 @@ function(x, ..., .starting=F){
   }
 }
 
-#' @rdname seed-funs
+#' @rdname seed_funs
 #' @details
 #' \code{withpseed} is the same as withseed, but assumes a parallel seed from 
 #' \code{\link[rsprng]{spawn.sprng}}.  When evaluated the beginning and endind seeds are
@@ -31,7 +32,7 @@ function(x, ..., .starting=F){
 #' 
 #' @importFrom rsprng unpack.sprng free.sprng pack.sprng
 #' @export
-withpseed <- function(seed, expr, envir=parent.frame()){
+withpseed <- function(seed, expr, envir=parent.frame()) {
   oldseed <- get.seed()
   RNGkind("user")
   unpack.sprng(seed)
@@ -43,9 +44,11 @@ withpseed <- function(seed, expr, envir=parent.frame()){
   } else {
     eval(substitute(function()expr), envir=envir)
   }
+  time <- proc.time()
   structure(fun(),
     starting.seed = seed,
-    ending.seed   = structure(pack.sprng(), class="pseed"))
+    ending.seed   = structure(pack.sprng(), class="pseed"),
+    time=structure(proc.time() - time, class = "proc_time"))
 }
 
 #' call an object continuing the random number stream.

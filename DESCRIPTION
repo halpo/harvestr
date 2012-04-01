@@ -17,6 +17,6 @@ Suggests:
     doParallel,
     foreach
 Collate:
-    'gather.R'
     'withseed.R'
+    'gather.R'
     'harvestr-package.R'

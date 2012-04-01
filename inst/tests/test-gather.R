@@ -22,10 +22,10 @@ message("Ignore printedwarnings they are expected, and impossible to supress.")
 { context("farm")
   e <- farm(seeds, rnorm(10))
   f <- farm(seeds, rnorm(10))
-  expect_identical(e,f)
+  expect_equivalent(e,f)
 }
 { context("reap")
-  expect_identical(reap(a, sample), reap(a, sample))
+  expect_equivalent(reap(a, sample), reap(a, sample))
 }
 { context("harvest")
   x <- harvest(e, sample, replace=T)
