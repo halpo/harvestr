@@ -32,7 +32,20 @@ function(x, ..., .starting=F){
 #' 
 #' @importFrom rsprng unpack.sprng free.sprng pack.sprng
 #' @export
-withpseed <- function(seed, expr, envir=parent.frame()) {
+withpseed <- function(seed, expr, envir=parent.frame(), cache=FALSE) {
+  if(cache){
+    browser()
+    cache.dir <- getOption("cache.dir", "harvestr-cache")
+    expr.md5  <- digest(substitute(expr), 'md5')
+    seed.md5  <- digest(seed, 'md5')
+    filename <- paste(expr.md5, '-', seed.md5, ".RData", sep='')
+    cache.file <- file.path(cache.dir, filename)
+    if(file.exists(cache.file)){
+      load(cache.file)
+      return(result)
+    }
+  }
+  stopifnot(inherits(seed, "pseed"))
   oldseed <- get.seed()
   RNGkind("user")
   unpack.sprng(seed)
@@ -45,10 +58,15 @@ withpseed <- function(seed, expr, envir=parent.frame()) {
     eval(substitute(function()expr), envir=envir)
   }
   time <- proc.time()
-  structure(fun(),
+  result <- structure(fun(),
     starting.seed = seed,
     ending.seed   = structure(pack.sprng(), class="pseed"),
     time=structure(proc.time() - time, class = "proc_time"))
+  if(cache){
+    if(!file.exists(cache.dir)) dir.create(cache.dir)
+    save(result, file=cache.file)
+  }
+  result
 }
 
 #' call an object continuing the random number stream.
@@ -59,11 +77,11 @@ withpseed <- function(seed, expr, envir=parent.frame()) {
 #' @seealso \code{\link{withpseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
-function(x, fun, ...){
+function(x, fun, ..., cache=FALSE){
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
-  withpseed(seed, fun(x,...))
+  withpseed(seed, fun(x,...), cache=cache)
 }
 
 #' Evaluate an expression for a set of seeds
@@ -75,14 +93,14 @@ function(x, fun, ...){
 #' @importFrom plyr llply
 #' @export
 farm <-
-function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
+function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
   fun <- if(is.function(expr)){
     stopifnot(is.null(formals(expr)))
     expr
   } else {
     eval(substitute(function()expr), envir=envir)
   }
-  llply(seeds, withpseed, fun, envir=environment(), .parallel=.parallel)
+  llply(seeds, withpseed, fun, envir=environment(), cache=cache, .parallel=.parallel)
 }
 
 
@@ -100,8 +118,8 @@ function(seeds, expr, envir=parent.frame(), .parallel=FALSE){
 #' @importFrom plyr mlply
 #' @export
 harvest <-
-function(.list, fun, ..., .parallel=F){
-  llply(.list, reap, fun, ..., .parallel=.parallel)
+function(.list, fun, ..., cache=FALSE, .parallel=F){
+  llply(.list, reap, fun, ..., cache=FALSE, .parallel=.parallel)
 }
 
 #' Strip attributes

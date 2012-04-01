@@ -42,4 +42,14 @@ message("Ignore printed warnings they are expected, and impossible to supress.")
   m2 <- lapply(data, with, mean(x123))
   expect_equivalent(m1, m2)
 }
+{ context("caching")
+  cache.dir <- file.path(tempdir(), "cache")
+  options(cache.dir=cache.dir)
+  seed <- gather(1)[[1]]
+  t1 <- system.time(run1 <- withpseed(seed, mean(rnorm(1e7)), cache=T))
+  t2 <- system.time(run2 <- withpseed(seed, mean(rnorm(1e7)), cache=T))
+  expect_true(all((t2 < t1)[1:3]))
+  expect_identical(run1, run2)
+  unlink(cache.dir, TRUE)
+}
 })
