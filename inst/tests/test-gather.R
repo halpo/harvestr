@@ -30,6 +30,13 @@ message("Ignore printed warnings they are expected, and impossible to supress.")
 }
 { context("reap")
   expect_equivalent(reap(a, sample), reap(a, sample))
+  local({
+    seed <- gather(1)[[1]]
+    x <- plant(list(1:10), list(seed))[[1]]
+    a <- reap(x, sample)
+    b <- withpseed(seed, sample(1:10))
+    expect_identical(a,b)
+  })
 }
 { context("harvest")
   x <- harvest(e, sample, replace=T)
@@ -41,15 +48,5 @@ message("Ignore printed warnings they are expected, and impossible to supress.")
   m1 <- harvest(data, with, mean(x123))
   m2 <- lapply(data, with, mean(x123))
   expect_equivalent(m1, m2)
-}
-{ context("caching")
-  cache.dir <- file.path(tempdir(), "cache")
-  options(cache.dir=cache.dir)
-  seed <- gather(1)[[1]]
-  t1 <- system.time(run1 <- withpseed(seed, mean(rnorm(1e7)), cache=T))
-  t2 <- system.time(run2 <- withpseed(seed, mean(rnorm(1e7)), cache=T))
-  expect_true(all((t2 < t1)[1:3]))
-  expect_identical(run1, run2)
-  unlink(cache.dir, TRUE)
 }
 })
