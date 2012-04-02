@@ -44,7 +44,7 @@ message("Ignore printed warnings they are expected, and impossible to supress.")
   expect_equivalent(x,y)
 }
 { context("using with")
-  data <- farm(gather(3, seed=1234), data.frame(x123=runif(100), y456=rnorm(100)))
+  data <- farm(gather(3), data.frame(x123=runif(100), y456=rnorm(100)))
   m1 <- harvest(data, with, mean(x123))
   m2 <- lapply(data, with, mean(x123))
   expect_equivalent(m1, m2)

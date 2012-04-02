@@ -109,10 +109,14 @@ function(x, fun, ..., cache=FALSE){
 #' @export
 farm <-
 function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
-  fun <- if(is.function(expr)){
+  fun <- if(is.name(substitute(expr)) && is.function(expr)){
     stopifnot(is.null(formals(expr)))
     expr
   } else {
+    if(cache){
+      cache <- structure(cache, 
+        expr.md5 = digest(substitute(expr), "md5"))
+    }
     eval(substitute(function()expr), envir=envir)
   }
   llply(seeds, withpseed, fun, envir=environment(), cache=cache, .parallel=.parallel)
