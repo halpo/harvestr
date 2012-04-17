@@ -2,8 +2,8 @@ library(harvestr)
 library(testthat)
 library(plyr)
 
-test_that("testing",{
-message("Ignore printed warnings they are expected, and impossible to supress.")
+test_that("testing", {
+# message("Ignore printed warnings they are expected, and impossible to supress.")
 { context("gather")
   suppressWarnings(suppressMessages({
     seeds  <- gather(10, seed=1234)
@@ -41,6 +41,12 @@ message("Ignore printed warnings they are expected, and impossible to supress.")
 { context("harvest")
   x <- harvest(e, sample, replace=T)
   y <- harvest(e, sample, replace=T)
+  expect_equivalent(x,y)
+}
+{ context("Permutation")
+  x <- harvest(e, sample, replace=T)
+  o <- sample(seq_along(e))
+  y <- harvest(e[o], sample, replace=T)[order(o)]
   expect_equivalent(x,y)
 }
 { context("using with")

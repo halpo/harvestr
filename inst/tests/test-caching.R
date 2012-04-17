@@ -12,9 +12,17 @@ long_function <- function(wait=15){
     paste(sample(56, 5), collapse=" "),
     '|', sample(46, 1), sep=' ')
 }
+takes_at_least <-function (amount) 
+{
+    function(expr) {
+        duration <- system.time(force(expr))["elapsed"]
+        expectation(duration > amount, 
+          sprintf("took %s seconds, which is more than %s", duration, amount))
+    }
+}
 { context("timings")
-  expect_that(withpseed(gather(1)[[1]], long_function(9)), takes_less_than(10))
-  expect_that(withpseed(gather(1)[[1]], long_function(9)), takes_less_than(11))
+  expect_that(withpseed(gather(1)[[1]], long_function(9), cache=T), takes_at_least(9))
+  expect_that(withpseed(gather(1)[[1]], long_function(9), cache=T), takes_less_than(9))
 }
 { context("caching")
   seed <- gather(1)[[1]]
