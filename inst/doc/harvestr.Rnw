@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage[margin=.7in]{geometry}
-%\VignetteIndexEntry{Using harvestr}
+%\VignetteIndexEntry{harvestr}
 
 \title{Using \texttt{harvestr} for replicable simulations}
 \author{Andrew Redd}

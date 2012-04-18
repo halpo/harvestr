@@ -20,10 +20,12 @@ test_that("testing", {
   expect_false(identical(a, c))  # FALSE
 }
 { context("farm")
+  seeds <- gather(10)
   e <- farm(seeds, rnorm(10))
   f <- farm(seeds, rnorm(10))
   expect_equivalent(e,f)
   
+  seeds <- gather(10)
   o <- sample(seq_along(seeds))
   g <- farm(seeds[o], rnorm(10))[order(o)]
   expect_equivalent(e,g)

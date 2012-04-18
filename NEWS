@@ -1,3 +1,17 @@
+harvestr 0.2
+------------
+
+Added caching.  The cache is an explicit parameter for each function.
+        The cache directory is controlled with option("harvestr.cache.dir")
+        and defaults to "harvestr-cache" if the opion is not set.
+        
+Added timing.  Each evaluation is timed and can be extracted from the 'time'
+        attribute of each results.
+        
+Speed improvements through optimizing withpseed.  No longer double evaluates.
+
+Added a vignette that explains the process flow for using harvestr.
+
 harvestr 0.1
 ------------
 

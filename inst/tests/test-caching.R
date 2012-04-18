@@ -21,6 +21,7 @@ takes_at_least <-function (amount)
     }
 }
 { context("timings")
+  if (file.exists(cache.dir)) unlink(cache.dir, recursive=TRUE, force=TRUE)
   expect_that(withpseed(gather(1)[[1]], long_function(9), cache=T), takes_at_least(9))
   expect_that(withpseed(gather(1)[[1]], long_function(9), cache=T), takes_less_than(9))
 }
@@ -29,14 +30,14 @@ takes_at_least <-function (amount)
   unlink(cache.dir, recursive=TRUE, force=TRUE)
   t1 <- system.time(run1 <- withpseed(seed, long_function(10), cache=T))
   t2 <- system.time(run2 <- withpseed(seed, long_function(10), cache=T))
-  expect_true(all((t2 <= t1)[1:3]))
+  expect_true(all(t2['elapsed'] <= t1['elapsed']))
   expect_identical(run1, run2)
   
   seeds <- gather(10)
   unlink(cache.dir, recursive=TRUE, force=TRUE)
   t1 <- system.time(run1 <- farm(seeds, mean(rnorm(1e6)), cache=T))
   t2 <- system.time(run2 <- farm(seeds, mean(rnorm(1e6)), cache=T))
-  expect_true(all((t2 <= t1)[1:3]))
+  expect_true(all(t2['elapsed'] <= t1['elapsed']))
   expect_identical(run1, run2)
   
   unlink(cache.dir, recursive=TRUE, force=TRUE)
@@ -44,7 +45,7 @@ takes_at_least <-function (amount)
   x <- plant( list(1:1e7), list(seed))[[1]]
   t1 <- system.time(run1 <- reap(x, long_sample, cache=T))
   t2 <- system.time(run2 <- reap(x, long_sample, cache=T))
-  expect_true(all((t2 <= t1)[1:3]))
+  expect_true(all(t2['elapsed'] <= t1['elapsed']))
   expect_identical(run1, run2)    
   unlink(cache.dir, recursive=TRUE, force=TRUE)
 }

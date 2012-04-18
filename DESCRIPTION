@@ -2,7 +2,7 @@ Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
 Version: 0.2
-Date: 2012-03-31
+Date: 2012-04-18
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy simulation and replicability.
@@ -15,7 +15,8 @@ Suggests:
     testthat,
     dostats,
     doParallel,
-    foreach
+    foreach,
+    lme4
 Collate:
     'withseed.R'
     'gather.R'
