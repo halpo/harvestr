@@ -1,3 +1,9 @@
+harvestr 0.3
+------------
+
+Added use_method to help with reference classes as input to harvest.
+
+
 harvestr 0.2
 ------------
 
