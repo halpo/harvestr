@@ -1,81 +1,68 @@
+{###############################################################################
+# gather.R
+# This file is part of the R package harvestr.
+# 
+# Copyright 2012 Andrew Redd
+# Date: 6/2/2012
+# 
+# DESCRIPTION
+# ===========
+# Interface level functions that define the process flow.
+#
+# gather -> farm -> harvest
+# gather -> plant -> harvest
+# 
+# LICENSE
+# ========
+# harvestr is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software 
+# Foundation, either version 3 of the License, or (at your option) any later 
+# version.
+# 
+# dostats is distributed in the hope that it will be useful, but WITHOUT ANY 
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with 
+# dostats. If not, see http://www.gnu.org/licenses/.
+# 
+}###############################################################################
+
 #' Gather independent seeds.
 #' @param x number of seeds, or an object with seeds to gather
+#' @param seed a seed to use to set the seed, must be compatible with "L'Ecuyer-CMRG"
 #' @param ... passed on
 #' @param .starting if TRUE starting seeds with be gathered rather than ending seeds.
 #'
 #' Equivalant to \code{\link[rsprng]{spawn.new.sprng}} when x is a number.
 #' 
-#' @importFrom rsprng spawn.new.sprng
+#' @seealso \link{RNG}
+#' @family harvest
+#' @importFrom parallel nextRNGStream
 #' @include withseed.R
 #' @export
 gather <- 
-function(x, ..., .starting=F){
+function(x, seed=get.seed(), ..., .starting=F){
   if(is.list(x)){
     seeds <- lapply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
     if(any(sapply(seeds, is.null)))
       stop("Malformed list.")
   } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
-    seeds <- as.list(as.data.frame(spawn.new.sprng(ceiling(x), ...)))
-    seeds <- llply(seeds, structure, class='pseed')
+    if(!is.null(seed)) {
+        set.seed(seed, kind="L'Ecuyer-CMRG", normal.kind="Inversion")
+    } else {
+        RNGkind(kind="L'Ecuyer-CMRG", normal.kind="Inversion")
+    }
+    r <- get.seed()
+    seeds <- vector('list', x)
+    for(i in seq_len(x)) {
+        r <-
+        seeds[[i]] <-  nextRNGStream(r)
+    }
     seeds
   } else {
     stop("x must be either a list or integer")
   }
-}
-
-#' @rdname seed_funs
-#' @param cache use cache, see Caching in \link{harvestr}
-#' @details
-#' \code{withpseed} is the same as withseed, but assumes a parallel seed from 
-#' \code{\link[rsprng]{spawn.sprng}}.  When evaluated the beginning and endind seeds are
-#' saved in the attributes "starting.seed" and "ending.seed", for continued evaluation with 
-#' \code{\link{harvest}}
-#' 
-#' @importFrom rsprng unpack.sprng free.sprng pack.sprng
-#' @export
-withpseed <- function(seed, expr, envir=parent.frame(), cache=FALSE) {
-  stopifnot(inherits(seed, "pseed"))
-  if(cache){
-    cache.dir <- getOption("harvestr.cache.dir", "harvestr-cache")
-    expr.md5 <- attr(cache, 'expr.md5')
-    parent.call <- sys.call(-1)[[1]]
-    if(is.null(expr.md5)){
-      se <- substitute(expr)
-      if(is.call(se))
-        expr.md5 <- digest(se , 'md5')
-      else
-        expr.md5 <- digest(expr, 'md5')
-    }
-    seed.md5 <- digest(seed, 'md5')
-    filename <- paste(expr.md5, '-', seed.md5, ".RData", sep='')
-    cache.file <- file.path(cache.dir, filename)
-    if(file.exists(cache.file)){
-      load(cache.file)
-      return(result)
-    }
-  }
-  oldseed <- get.seed()
-  RNGkind("user")
-  unpack.sprng(seed)
-  on.exit(free.sprng())
-  on.exit(replace.seed(oldseed), add=T)
-  fun <- if(is.name(substitute(expr)) && is.function(expr)){
-    stopifnot(is.null(formals(expr)))
-    expr
-  } else {
-    eval(substitute(function()expr), envir=envir)
-  }
-  start.time <- proc.time()
-  result <- fun()
-  result <- structure(result,
-    starting.seed = seed,
-    ending.seed   = structure(pack.sprng(), class="pseed"),
-    time=structure(proc.time() - start.time, class = "proc_time"))
-  if(cache){
-    if(!file.exists(cache.dir)) dir.create(cache.dir)
-    save(result, file=cache.file)
-  }
-  result
 }
 
 #' Call a function continuing the random number stream.
@@ -84,7 +71,7 @@ withpseed <- function(seed, expr, envir=parent.frame(), cache=FALSE) {
 #' @param ... passed onto function
 #' @param cache use cache, see Caching in \code{link{harvestr}}
 #' 
-#' @seealso \code{\link{withpseed}}, \code{\link{harvest}}, and \code{\link{with}}
+#' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
 function(x, fun, ..., cache=FALSE){
@@ -95,7 +82,7 @@ function(x, fun, ..., cache=FALSE){
     cache <- structure(cache, 
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
-  withpseed(seed, fun(x,...), cache=cache)
+  withseed(seed, fun(x,...), cache=cache)
 }
 
 #' Evaluate an expression for a set of seeds
@@ -106,6 +93,7 @@ function(x, fun, ..., cache=FALSE){
 #' @param cache use cache, see Caching in \code{link{harvestr}}
 #' 
 #' @importFrom plyr llply
+#' @family harvest
 #' @export
 farm <-
 function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
@@ -119,7 +107,7 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
     }
     eval(substitute(function()expr), envir=envir)
   }
-  llply(seeds, withpseed, fun, envir=environment(), cache=cache, .parallel=.parallel)
+  llply(seeds, withseed, fun, envir=environment(), cache=cache, .parallel=.parallel)
 }
 
 
@@ -132,10 +120,11 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
 #' 
 #' @details
 #' harvest is functionaly equivalant to llply, but takes on additional capability when used
-#' with the other functions from this package.  When an object comes from \code{\link{withpseed}}
+#' with the other functions from this package.  When an object comes from \code{\link{withseed}}
 #' the ending seed is extacted and used to continue evaluation.
 #' 
 #' @importFrom plyr mlply
+#' @family harvest
 #' @export
 harvest <-
 function(.list, fun, ..., cache=FALSE, .parallel=F){
@@ -144,6 +133,7 @@ function(.list, fun, ..., cache=FALSE, .parallel=F){
 
 #' Strip attributes
 #' @param x, any object
+#' @family harvest
 #' @export
 noattr <- noattributes <- function(x){
   if(is.list(x)){
@@ -153,14 +143,6 @@ noattr <- noattributes <- function(x){
   x
 }
 
-#' @S3method print pseed
-#' @importFrom digest digest
-print.pseed <- 
-function(x, ...){
-  cat(sprintf("<sprng parallel seed: MD5=%s>", digest(x)), ...)
-  invisible(x)
-}
-
 #' Plant elements with seeds
 #' @param .list a list to set seeds on
 #' @param seeds to plant from \code{\link{gather}}
@@ -168,6 +150,7 @@ function(x, ...){
 #' For each element in list set an in dependent random seed.
 #' This will replace and ending seeds values already set for the objects in the list.
 #' 
+#' @family harvest
 #' @export
 plant <-
 function(.list, seeds=gather(length(.list))){

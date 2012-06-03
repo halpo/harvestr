@@ -1,3 +1,4 @@
+library(harvestr)
 library(plyr)
 mr <- setRefClass("HelloWorld",
   fields = list(
