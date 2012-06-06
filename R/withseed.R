@@ -31,6 +31,7 @@
 #' @param expr expression to evaluate.
 #' @param envir the \code{\link{environment}} to evaluate the code in. 
 #' @param cache should results be cached or retrieved from cache.
+#' @param time should results be timed?
 #' 
 #' @details
 #' Compute the expr with the given seed, replacing the global seed after compuatations
@@ -42,7 +43,8 @@
 #' @seealso \code{\link{set.seed}}
 #' @export
 withseed <- function(seed, expr, envir=parent.frame()
-                    , cache = getOption('harvestr.use.cache', FALSE)){
+                    , cache = getOption('harvestr.use.cache', FALSE)
+                    , time  = getOption('harvestr.time', FALSE)){
   if(cache){
     cache.dir <- getOption("harvestr.cache.dir", "harvestr-cache")
     expr.md5 <- attr(cache, 'expr.md5')
@@ -74,12 +76,12 @@ withseed <- function(seed, expr, envir=parent.frame()
   } else {
     eval(substitute(function()expr), envir=envir)
   }
-  start.time <- proc.time()
+  if(time) start.time <- proc.time()
   result <- fun()
   result <- structure(result,
     starting.seed = seed,
     ending.seed   = get.seed(),
-    time=structure(proc.time() - start.time, class = "proc_time"))
+    time=if(time)structure(proc.time() - start.time, class = "proc_time"))
   if(cache){
     if(!file.exists(cache.dir)) dir.create(cache.dir)
     save(result, file=cache.file)
