@@ -18,6 +18,18 @@ b <-
 llply(l, withseed, runif(10), environment())
 identical(a,b)
 
+a <- replicate(3, {
+    r <<- nextRNGStream(s)
+    replicate(3, r <<- nextRNGSubStream(r), T)
+}, F)
+
+b <- replicate(3, {
+    r <<- nextRNGStream(s)
+    runif(10)
+    replicate(3, r <<- nextRNGSubStream(r), T)
+}, F)
+
+
 
 
 nextRNGSubStream(s)
@@ -26,6 +38,7 @@ a <- runif(10)
 
 nextRNGStream(s)
 nextRNGSubStream(s)
+
 set.seed(r)
 b <- runif(10)
 

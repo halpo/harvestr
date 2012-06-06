@@ -1,3 +1,11 @@
+harvestr 0.4
+------------
+* Removed dependence on `rsprng`, now depends on `parallel` base package.
+* Removed volatile tests cache timings and parallel.  Moved to examples.
+* timing in now optional, controlled with option `harvestr.time`
+* caching controlled by option `harvestr.use.cache`
+* Support for RNG sub streams with sprout & graft.
+
 harvestr 0.3
 ------------
 
