@@ -57,12 +57,38 @@ function(x, seed=get.seed(), ..., .starting=F){
     seeds <- vector('list', x)
     for(i in seq_len(x)) {
         r <-
-        seeds[[i]] <-  nextRNGStream(r)
+        seeds[[i]] <-  structure(nextRNGStream(r), RNGlevel='stream')
     }
     seeds
   } else {
     stop("x must be either a list or integer")
   }
+}
+
+#' Create substreams of numbers based of a current stream.
+#'
+#' @param seed a current random number stream compatible with 
+#'        \code{\link{nextRNGSubStream}}
+#' @param n number of new streams to create.
+#'
+#' @family harvest
+#' @seealso \code{\link{nextRNGSubStream}}
+#' @importFrom parallel nextRNGSubStream
+#' @export
+sprout <- function(seed, n) {
+    es <- attr(seed, 'ending.seed')
+    if(!is.null(es)) seed <- es
+    rng.level <- attr(seed, 'RNGlevel')
+    if(!is.null(rng.level) && rng.level == 'substream') {
+        warning(paste('RNG seed provided si already a substream seed,'
+                     ,'independence of streams not guaranteed.'))
+    }
+    
+    seeds <- replicate(n, simplify=FALSE, {
+        seed <<- structure(nextRNGSubStream(seed)
+                          , RNGlevel = 'substream')
+    }) 
+    seeds
 }
 
 #' Call a function continuing the random number stream.
@@ -74,7 +100,7 @@ function(x, seed=get.seed(), ..., .starting=F){
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
-function(x, fun, ..., cache=FALSE){
+function(x, fun, ..., cache=FALSE) {
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
@@ -97,6 +123,8 @@ function(x, fun, ..., cache=FALSE){
 #' @export
 farm <-
 function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
+  if(is.numeric(seeds) && length(seeds)==1)
+    seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
     stopifnot(is.null(formals(expr)))
     expr
@@ -127,7 +155,7 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
 #' @family harvest
 #' @export
 harvest <-
-function(.list, fun, ..., cache=FALSE, .parallel=F){
+function(.list, fun, ..., cache=FALSE, .parallel=F) {
   llply(.list, reap, fun, ..., cache=FALSE, .parallel=.parallel)
 }
 
@@ -135,7 +163,7 @@ function(.list, fun, ..., cache=FALSE, .parallel=F){
 #' @param x, any object
 #' @family harvest
 #' @export
-noattr <- noattributes <- function(x){
+noattr <- noattributes <- function(x) {
   if(is.list(x)){
     x <- llply(x, noattributes)
   }
@@ -143,7 +171,7 @@ noattr <- noattributes <- function(x){
   x
 }
 
-#' Plant elements with seeds
+#' Assign elements of a list with seeds
 #' @param .list a list to set seeds on
 #' @param seeds to plant from \code{\link{gather}}
 #'
@@ -153,7 +181,7 @@ noattr <- noattributes <- function(x){
 #' @family harvest
 #' @export
 plant <-
-function(.list, seeds=gather(length(.list))){
+function(.list, seeds=gather(length(.list))) {
   stopifnot(is.list(.list))
   n <- length(.list)
   stopifnot(n == length(seeds))
@@ -163,3 +191,15 @@ function(.list, seeds=gather(length(.list))){
   return(.list)
 }
 
+#' @rdname plant
+#' 
+#' @param x an objects that already has seeds.
+#' @param n number of seeds to create
+#'
+#' \code{graft} will take an object, and produce independent substreams
+#' of random numbers for stochastic analysis. 
+#' @family harvest
+#' @export
+graft <-
+function(x, n, seeds = sprout(x, n)) 
+    plant(replicate(length(seeds), x, F), seeds)
