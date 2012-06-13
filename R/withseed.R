@@ -47,12 +47,12 @@ withseed <- function(seed, expr, envir=parent.frame()
                     , time  = getOption('harvestr.time', FALSE)){
   oldseed <- get.seed()
   on.exit(replace.seed(oldseed))
+  se <- substitute(expr)
   if(cache){
     cache.dir <- getOption("harvestr.cache.dir", "harvestr-cache")
     expr.md5 <- attr(cache, 'expr.md5')
     parent.call <- sys.call(-1)[[1]]
     if(is.null(expr.md5)){
-      se <- substitute(expr)
       if(is.call(se))
         expr.md5 <- digest(se , 'md5')
       else
@@ -69,9 +69,15 @@ withseed <- function(seed, expr, envir=parent.frame()
   # RNGkind("L'Ecuyer-CMRG", "Inversion")
   # set.seed(seed, "L'Ecuyer-CMRG", "Inversion")
   replace.seed(seed)
-  fun <- if(is.name(substitute(expr)) && is.function(expr)){
-    stopifnot(is.null(formals(expr)))
-    expr
+  fun <- if(is.name(se)){
+    if(is.function(expr)){
+        stopifnot(is.null(formals(expr)))
+        expr
+    } else if(is.call(expr)) {
+        as.function(list(expr), envir=envir)
+    } else {
+        eval(substitute(function()expr), envir=envir)
+    }
   } else {
     eval(substitute(function()expr), envir=envir)
   }
@@ -111,7 +117,7 @@ get.seed <- function(){
 replace.seed <- function(seed, delete=TRUE){
   if(is.null(seed)){
     if(delete)
-      remove(.Random.seed, envir=.GlobalEnv)
+      remove('.Random.seed', envir=.GlobalEnv)
   } else {
     assign('.Random.seed', noattr(seed), envir=.GlobalEnv) 
   }

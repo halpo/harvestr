@@ -65,8 +65,8 @@ test_that("caching in farm with mean of rnorm", {
     expect_true(all(t2[1] <= t1[1]))
     expect_identical(run1, run2)
 })  
-test_that("caching in reap with lnog sample", {
-    seeds <- gather(10)
+test_that("caching in reap with long sample", {
+    seed <- gather(1)[[1]]
     unlink(cache.dir, recursive=TRUE, force=TRUE)
     long_sample <- compose(head, sample)
     x <- plant( list(1:1e7), list(seed))[[1]]

@@ -117,13 +117,15 @@ function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
 #' @param seeds a list of seeds can be obtained though \code{\link{gather}}
 #' @param expr an expression to evalutate with the different seeds.
 #' @param envir an environment within which to evaluate \code{expr}.
+#' @param ... extra arguments
+#' @param cache should cached results be used or generated?
 #' @param .parallel should the computations be run in parallel?
 #' 
 #' @importFrom plyr llply
 #' @family harvest
 #' @export
 farm <-
-function(seeds, expr, envir=parent.frame(), ...
+function(seeds, expr, envir = parent.frame(), ...
     , cache=getOption('harvestr.use.cache', FALSE), .parallel=FALSE){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
@@ -131,13 +133,9 @@ function(seeds, expr, envir=parent.frame(), ...
     stopifnot(is.null(formals(expr)))
     expr
   } else {
-    if(cache){
-      cache <- structure(cache, 
-        expr.md5 = digest(substitute(expr), "md5"))
-    }
-    eval(substitute(function(){expr}), envir=envir)
+    substitute(expr)
   }
-  llply(.data=seeds, .fun=withseed, fun, envir=environment(), ...
+  llply(.data=seeds, .fun=withseed, fun, envir=envir, ...
         , cache=cache, .parallel=.parallel)
 }
 

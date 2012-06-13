@@ -24,7 +24,6 @@
 # dostats. If not, see http://www.gnu.org/licenses/.
 # 
 }###############################################################################
-library(harvestr)
 library(testthat)
 library(plyr)
 context("main functions")
@@ -55,32 +54,34 @@ test_that("farm is replicable", {
     expect_equivalent(e,f)
 })
 test_that('farm is indifferent to order.', {
-  seeds <- gather(10)
-  o <- sample(seq_along(seeds))
-  e <- farm(seeds, rnorm(10))
-  g <- farm(seeds[o], rnorm(10))[order(o)]
-  expect_equivalent(e,g)
+    seeds <- gather(10)
+    o <- sample(seq_along(seeds))
+    e <- farm(seeds, rnorm(10))
+    g <- farm(seeds[o], rnorm(10))[order(o)]
+    expect_equivalent(e,g)
 })
-test_that("reap", {
-  expect_equivalent(reap(a, sample), reap(a, sample))
-  local({
+test_that("reap is reproducible", {
     seed <- gather(1)[[1]]
     x <- plant(list(1:10), list(seed))[[1]]
     a <- reap(x, sample)
     b <- withseed(seed, sample(1:10))
     expect_identical(a,b)
-  })
+    expect_identical(reap(a, sample), reap(a, sample))
 })
 test_that("harvest", {
-  x <- harvest(e, sample, replace=T)
-  y <- harvest(e, sample, replace=T)
-  expect_equivalent(x,y)
+    seeds <- gather(10)
+    e <- farm(seeds, rnorm(10))
+    x <- harvest(e, sample, replace=T)
+    y <- harvest(e, sample, replace=T)
+    expect_equivalent(x,y)
 })
 test_that("Permutation", {
-  x <- harvest(e, sample, replace=T)
-  o <- sample(seq_along(e))
-  y <- harvest(e[o], sample, replace=T)[order(o)]
-  expect_equivalent(x,y)
+    seeds <- gather(10)
+    e <- farm(seeds, rnorm(10))
+    x <- harvest(e, sample, replace=T)
+    o <- sample(seq_along(e))
+    y <- harvest(e[o], sample, replace=T)[order(o)]
+    expect_equivalent(x,y)
 })
 test_that("using with", {
   data <- farm(gather(3), data.frame(x123=runif(100), y456=rnorm(100)))
