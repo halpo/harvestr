@@ -40,3 +40,12 @@ use_method <- function(method, ...){
     fun(...)
   }
 }
+
+#' retrieve the total time for a simulation
+#' 
+#' @param x a list from harvest
+#' @export
+total_time <- function(x){
+    times <- sapply(x, attr, 'time')
+    sum(times['elapsed',])
+}

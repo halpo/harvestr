@@ -27,36 +27,41 @@
 library(harvestr)
 library(testthat)
 library(plyr)
+context("main functions")
 
-test_that("testing", {
-# message("Ignore printed warnings they are expected, and impossible to supress.")
-{ context("gather")
-  suppressWarnings(suppressMessages({
+test_that("gather is replicable", {
     seeds  <- gather(10, seed=1234)
     seeds0 <- gather(10, seed=1234)
-  }))
-  expect_identical(seeds, seeds0)
-}
-{ context("withseed")
-  seed <- seeds[[1]]
-  noattr(a <- withseed(seed, rnorm(10)))
-  noattr(b <- withseed(seed, rnorm(10)))
-  c <- rnorm(10)
-  expect_identical(a, b)
-  expect_false(identical(a, c))  # FALSE
-}
-{ context("farm")
-  seeds <- gather(10)
-  e <- farm(seeds, rnorm(10))
-  f <- farm(seeds, rnorm(10))
-  expect_equivalent(e,f)
-  
+    expect_identical(seeds, seeds0)
+})
+test_that("gather gives the appropriate kinds of seed.", {
+    seed <- gather(1)[[1]]
+    replace.seed(seed)
+    expect_identical(RNGkind(), c("L'Ecuyer-CMRG", "Inversion"))
+})
+test_that("gather replaces seed.", {
+    set.seed(123, "Mersenne-Twister", "Box-Muller")
+    l <- get.seed()
+    seeds <- gather(10)
+    k <- get.seed()
+    expect_identical(l,k)
+    expect_identical(RNGkind(), c("Mersenne-Twister", "Box-Muller"))
+})
+test_that("farm is replicable", {
+    seeds <- gather(10)
+    e <- farm(seeds, rnorm(10), cache=F, time=F)
+    f <- farm(seeds, rnorm(10), cache=F, time=F)
+    expect_identical(e,f)
+    expect_equivalent(e,f)
+})
+test_that('farm is indifferent to order.', {
   seeds <- gather(10)
   o <- sample(seq_along(seeds))
+  e <- farm(seeds, rnorm(10))
   g <- farm(seeds[o], rnorm(10))[order(o)]
   expect_equivalent(e,g)
-}
-{ context("reap")
+})
+test_that("reap", {
   expect_equivalent(reap(a, sample), reap(a, sample))
   local({
     seed <- gather(1)[[1]]
@@ -65,22 +70,21 @@ test_that("testing", {
     b <- withseed(seed, sample(1:10))
     expect_identical(a,b)
   })
-}
-{ context("harvest")
+})
+test_that("harvest", {
   x <- harvest(e, sample, replace=T)
   y <- harvest(e, sample, replace=T)
   expect_equivalent(x,y)
-}
-{ context("Permutation")
+})
+test_that("Permutation", {
   x <- harvest(e, sample, replace=T)
   o <- sample(seq_along(e))
   y <- harvest(e[o], sample, replace=T)[order(o)]
   expect_equivalent(x,y)
-}
-{ context("using with")
+})
+test_that("using with", {
   data <- farm(gather(3), data.frame(x123=runif(100), y456=rnorm(100)))
   m1 <- harvest(data, with, mean(x123))
   m2 <- lapply(data, with, mean(x123))
   expect_equivalent(m1, m2)
-}
 })

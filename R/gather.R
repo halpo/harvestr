@@ -43,6 +43,8 @@
 #' @export
 gather <- 
 function(x, seed=get.seed(), ..., .starting=F){
+  oldseed <- get.seed()
+  on.exit(replace.seed(oldseed))
   if(is.list(x)){
     seeds <- lapply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
     if(any(sapply(seeds, is.null)))
@@ -100,7 +102,7 @@ sprout <- function(seed, n) {
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
-function(x, fun, ..., cache=FALSE) {
+function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
@@ -116,13 +118,13 @@ function(x, fun, ..., cache=FALSE) {
 #' @param expr an expression to evalutate with the different seeds.
 #' @param envir an environment within which to evaluate \code{expr}.
 #' @param .parallel should the computations be run in parallel?
-#' @param cache use cache, see Caching in \code{link{harvestr}}
 #' 
 #' @importFrom plyr llply
 #' @family harvest
 #' @export
 farm <-
-function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
+function(seeds, expr, envir=parent.frame(), ...
+    , cache=getOption('harvestr.use.cache', FALSE), .parallel=FALSE){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
@@ -133,9 +135,10 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
       cache <- structure(cache, 
         expr.md5 = digest(substitute(expr), "md5"))
     }
-    eval(substitute(function()expr), envir=envir)
+    eval(substitute(function(){expr}), envir=envir)
   }
-  llply(seeds, withseed, fun, envir=environment(), cache=cache, .parallel=.parallel)
+  llply(.data=seeds, .fun=withseed, fun, envir=environment(), ...
+        , cache=cache, .parallel=.parallel)
 }
 
 
@@ -143,7 +146,6 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
 #' @param .list a list of \code{data.frame}s  See details.
 #' @param fun a function to apply
 #' @param ... passed to \code{fun}
-#' @param cache use cache, see Caching in \code{link{harvestr}}
 #' @param .parallel should the computations be run in parallel?
 #' 
 #' @details
@@ -155,8 +157,8 @@ function(seeds, expr, envir=parent.frame(), cache=FALSE, .parallel=FALSE){
 #' @family harvest
 #' @export
 harvest <-
-function(.list, fun, ..., cache=FALSE, .parallel=F) {
-  llply(.list, reap, fun, ..., cache=FALSE, .parallel=.parallel)
+function(.list, fun, ..., .parallel=F) {
+  llply(.list, reap, fun, ..., .parallel=.parallel)
 }
 
 #' Strip attributes
