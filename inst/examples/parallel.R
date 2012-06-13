@@ -23,8 +23,7 @@ test_that("farm is parallelizable.", {
     seeds <- gather(4)
     a <- farm(seeds, runif(5))
     b <- farm(seeds, runif(5))
-    c <- suppressWarnings(
-         farm(seeds, runif(5), .parallel=T))
+    c <- farm(seeds, runif(5), .parallel=T)
     
     expect_identical(a, b)
     expect_identical(a, c)
@@ -33,8 +32,7 @@ test_that('harvest is parallelizable with option', {
     seeds <- gather(100, seed=1234)
     e <- farm(seeds, rnorm(10))
     x <- harvest(e, sample, replace=T)
-    z <- suppressWarnings(
-         harvest(e, sample, replace=T, .parallel=T))
+    z <- harvest(e, sample, replace=T, .parallel=T)
     expect_equivalent(noattr(x),noattr(z))
 })
 }

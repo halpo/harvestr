@@ -110,7 +110,8 @@ function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
     cache <- structure(cache, 
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
-  withseed(seed, fun(x,...), cache=cache)
+  f <- function(){fun(x,...)}
+  withseed(seed, f, cache=cache)
 }
 
 #' Evaluate an expression for a set of seeds
