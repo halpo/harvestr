@@ -16,7 +16,8 @@ Suggests:
     dostats,
     doParallel,
     foreach,
-    lme4
+    lme4,
+    boot
 Collate:
     'withseed.R'
     'gather.R'

@@ -7,38 +7,32 @@ if(require(doParallel)) {
   registerDoParallel(cl)
 }
 { context("parallel")
-test_that('parallel', {
-  if(require(doParallel)) {
+test_that('withseed is invariante under foreach', {
     seed=gather(1, seed=1234)[[1]]
-    r <- foreach(seed = replicate(4, seed, simplify=F)) %do%  
-      RNGkind()
+    r <- foreach(seed = replicate(4, seed, simplify=F)) %do%
       withseed(seed, rnorm(1e5))
     s <- foreach(seed = replicate(4, seed, simplify=F)) %dopar%
-      RNGkind()
       withseed(seed, rnorm(1e5))
 
-    names(attributes(r[[1]]))
-    names(attributes(s[[1]]))
-    
-    attributes(r[[1]])$starting.seed
-    attributes(r[[1]])$ending.seed
-    
-    attributes(s[[1]])$starting.seed
-    attributes(s[[1]])$ending.seed
-    
-    identical(noattr(r), noattr(s))
-    # r <- llply(replicate(12, seed, simplify=F), withpseed, function(...)rnorm(10000))
-    # s <- llply(replicate(12, seed, simplify=F), withpseed, function(...)rnorm(10000), .parallel=T)
+    identical((r), (s)) 
     expect_true(all(laply(r, all.equal, r[[1]], check.attributes=F)))
     expect_true(all(laply(s, all.equal, s[[1]], check.attributes=F)))
-
+})
+test_that("farm is parallelizable.", {
+    set.seed(123)
+    seeds <- gather(4)
+    a <- farm(seeds, runif(5))
+    b <- farm(seeds, runif(5))
+    c <- farm(seeds, runif(5), .parallel=T)
     
-
+    expect_identical(a, b)
+    expect_identical(a, c)
+})
+test_that('harvest is parallelizable with option', {
     seeds <- gather(100, seed=1234)
     e <- farm(seeds, rnorm(10))
     x <- harvest(e, sample, replace=T)
     z <- harvest(e, sample, replace=T, .parallel=T)
     expect_equivalent(noattr(x),noattr(z))
-  }
-}
+})
 }

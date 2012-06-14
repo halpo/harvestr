@@ -75,3 +75,13 @@ test_that('seeds set properly - withseed', {
     
     expect_identical(cseed, .Random.seed)
 })
+test_that('withseed handles passed expressions', {
+    expr <- quote(runif(10))
+    seed <- gather(1)[[1]]
+    a <- withseed(seed, expr)
+    b <- withseed(seed, runif(10))
+    
+    expect_that(a, equals(b))
+    expect_that(length(a), equals(10))
+    expect_that(all(0<=a & a<=1), is_true())
+})
