@@ -1,3 +1,16 @@
+harvestr 0.5.1
+--------------
+* Documentation updates:
+    + Stripped last remaining references to rsprng.
+    + Expanded documentation for `farm`, `plant`, and `gather`
+* Version bump to 0.5.1 to avoid possible conflict on github.
+
+harvestr 0.5
+------------
+* Major bugfix that prevented independent streams, in fact the same stream would be run.
+* new tests to prevent that condition again.
+
+
 harvestr 0.4
 ------------
 * Removed dependence on `rsprng`, now depends on `parallel` base package.
