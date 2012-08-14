@@ -29,12 +29,15 @@
 }###############################################################################
 
 #' Gather independent seeds.
+#' 
+#' Collect seeds representing independent random number streams.
+#' These seeds can them be used in \code{\link{farm}} or \code{\link{plant}}.
+#' 
+#' 
 #' @param x number of seeds, or an object with seeds to gather
 #' @param seed a seed to use to set the seed, must be compatible with "L'Ecuyer-CMRG"
 #' @param ... passed on
 #' @param .starting if TRUE starting seeds with be gathered rather than ending seeds.
-#'
-#' Equivalant to \code{\link[rsprng]{spawn.new.sprng}} when x is a number.
 #' 
 #' @seealso \link{RNG}
 #' @family harvest
@@ -69,6 +72,13 @@ function(x, seed=get.seed(), ..., .starting=F){
 
 #' Create substreams of numbers based of a current stream.
 #'
+#' Seeds from \code{\link{gather}} can be used to generate another
+#' set of independent streams.  These seeds can be given to 
+#' \code{\link{graft}}
+#' 
+#' As a convenience \code{seed} can be an object that has a seed attached, 
+#' ie. the result of any \code{harvestr} function.
+#' 
 #' @param seed a current random number stream compatible with 
 #'        \code{\link{nextRNGSubStream}}
 #' @param n number of new streams to create.
@@ -94,10 +104,19 @@ sprout <- function(seed, n) {
 }
 
 #' Call a function continuing the random number stream.
+#' 
+#' The \code{reap} function is the central function to \code{harvest}.
+#' It takes an object, \code{x}, extracts the previous seed, ie. state of 
+#' the random number generator, sets the seed, and continues any evaluation.
+#' This creates a continuous random number stream, that is completly
+#' reproducible.
+#' 
+#' The function calling works the same as the \link{apply} family of functions.
+#' 
 #' @param x an object
 #' @param fun a function to call on object
 #' @param ... passed onto function
-#' @param cache use cache, see Caching in \code{link{harvestr}}
+#' @param cache use cache, see Caching in \code{\link{harvestr}}
 #' 
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
@@ -114,7 +133,14 @@ function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
   withseed(seed, f, cache=cache)
 }
 
-#' Evaluate an expression for a set of seeds
+#' Evaluate an expression for a set of seeds.
+#' 
+#' For each seed, set the seed, then evaluate the expression.
+#' The \code{farm} function is used to generate data.
+#' The Seeds for the state of the random numbrer generator is stored in the 
+#' attribute \code{'ending.seed'}, and will be used by harvestr functions
+#' for any other random number generation that is needed.
+#' 
 #' @param seeds a list of seeds can be obtained though \code{\link{gather}}
 #' @param expr an expression to evalutate with the different seeds.
 #' @param envir an environment within which to evaluate \code{expr}.
@@ -141,7 +167,7 @@ function(seeds, expr, envir = parent.frame(), ...
 }
 
 
-#' Harvest results
+#' Harvest the results.
 #' @param .list a list of \code{data.frame}s  See details.
 #' @param fun a function to apply
 #' @param ... passed to \code{fun}
@@ -160,9 +186,10 @@ function(.list, fun, ..., .parallel=F) {
   llply(.list, reap, fun, ..., .parallel=.parallel)
 }
 
-#' Strip attributes
+#' Strip attributes from an object.
+#' 
 #' @param x, any object
-#' @family harvest
+#' @seealso \link{attributes}
 #' @export
 noattr <- noattributes <- function(x) {
   if(is.list(x)){
@@ -174,10 +201,13 @@ noattr <- noattributes <- function(x) {
 
 #' Assign elements of a list with seeds
 #' @param .list a list to set seeds on
-#' @param seeds to plant from \code{\link{gather}}
+#' @param seeds to plant from \code{\link{gather}} or \code{\link{sprout}}
 #'
-#' For each element in list set an in dependent random seed.
-#' This will replace and ending seeds values already set for the objects in the list.
+#' @description
+#' The function \code{plant} assigns 
+#' each element in list set seed.
+#' This will replace and ending seeds values already set for the 
+#' objects in the list.
 #' 
 #' @family harvest
 #' @export
@@ -193,13 +223,14 @@ function(.list, seeds=gather(length(.list))) {
 }
 
 #' @rdname plant
+#' @aliases graft
+#' 
+#' @description
+#' The \code{graft} function replicates an object with independent substreams.
+#' The result from \code{graft} should be used with \code{\link{harvest}}.
 #' 
 #' @param x an objects that already has seeds.
 #' @param n number of seeds to create
-#'
-#' \code{graft} will take an object, and produce independent substreams
-#' of random numbers for stochastic analysis. 
-#' @family harvest
 #' @export
 graft <-
 function(x, n, seeds = sprout(x, n)) 
