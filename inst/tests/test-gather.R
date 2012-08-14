@@ -27,6 +27,7 @@
 library(testthat)
 library(plyr)
 context("main functions")
+options(harvestr.time=FALSE)
 
 test_that("gather is replicable", {
     seeds  <- gather(10, seed=1234)

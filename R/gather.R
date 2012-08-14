@@ -117,11 +117,13 @@ sprout <- function(seed, n) {
 #' @param fun a function to call on object
 #' @param ... passed onto function
 #' @param cache use cache, see Caching in \code{\link{harvestr}}
+#' @param time should results be timed?
 #' 
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
-function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
+function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
+                    , time  = getOption('harvestr.time', FALSE)) {
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
@@ -130,7 +132,7 @@ function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
   f <- function(){fun(x,...)}
-  withseed(seed, f, cache=cache)
+  withseed(seed, f, cache=cache, time=time)
 }
 
 #' Evaluate an expression for a set of seeds.
@@ -146,14 +148,17 @@ function(x, fun, ..., cache=getOption('harvestr.use.cache', FALSE)) {
 #' @param envir an environment within which to evaluate \code{expr}.
 #' @param ... extra arguments
 #' @param cache should cached results be used or generated?
+#' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
 #' 
-#' @importFrom plyr llply
+#' @importFrom plyr llply ldply
 #' @family harvest
 #' @export
 farm <-
 function(seeds, expr, envir = parent.frame(), ...
-    , cache=getOption('harvestr.use.cache', FALSE), .parallel=FALSE){
+        , cache = getOption('harvestr.use.cache', FALSE)
+        , time  = getOption('harvestr.time', FALSE)
+        , .parallel = FALSE){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
@@ -162,8 +167,13 @@ function(seeds, expr, envir = parent.frame(), ...
   } else {
     substitute(expr)
   }
-  llply(.data=seeds, .fun=withseed, fun, envir=envir, ...
-        , cache=cache, .parallel=.parallel)
+  results <- llply(.data=seeds, .fun=withseed, fun, envir=envir, ...
+                  , cache=cache, time=time, .parallel=.parallel)
+  if(time){
+      times <- ldply(results, attr, 'time')
+      attributes(results)$time <- structure(colSums(times), class = 'proc_time') 
+  }
+  results
 }
 
 
@@ -171,6 +181,7 @@ function(seeds, expr, envir = parent.frame(), ...
 #' @param .list a list of \code{data.frame}s  See details.
 #' @param fun a function to apply
 #' @param ... passed to \code{fun}
+#' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
 #' 
 #' @details
@@ -182,8 +193,14 @@ function(seeds, expr, envir = parent.frame(), ...
 #' @family harvest
 #' @export
 harvest <-
-function(.list, fun, ..., .parallel=F) {
-  llply(.list, reap, fun, ..., .parallel=.parallel)
+function(.list, fun, ...
+         , time  = getOption('harvestr.time', FALSE), .parallel=F) {
+  results <- llply(.list, reap, fun, ..., .parallel=.parallel)
+  if(time){
+      times <- ldply(results, attr, 'time')
+      attributes(results)$time <- structure(colSums(times), class = 'proc_time') 
+  }
+  results
 }
 
 #' Strip attributes from an object.

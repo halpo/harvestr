@@ -1,3 +1,8 @@
+harvestr 0.5.2
+--------------
+* Bug fix for time option not carrying forward.
+
+
 harvestr 0.5.1
 --------------
 * Documentation updates:
