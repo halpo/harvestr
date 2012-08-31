@@ -170,8 +170,7 @@ function(seeds, expr, envir = parent.frame(), ...
   results <- llply(.data=seeds, .fun=withseed, fun, envir=envir, ...
                   , cache=cache, time=time, .parallel=.parallel)
   if(time){
-      times <- ldply(results, attr, 'time')
-      attributes(results)$time <- structure(colSums(times), class = 'proc_time') 
+      attributes(results)$time <- total_time(results)
   }
   results
 }
@@ -195,10 +194,9 @@ function(seeds, expr, envir = parent.frame(), ...
 harvest <-
 function(.list, fun, ...
          , time  = getOption('harvestr.time', FALSE), .parallel=F) {
-  results <- llply(.list, reap, fun, ..., .parallel=.parallel)
+  results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
   if(time){
-      times <- ldply(results, attr, 'time')
-      attributes(results)$time <- structure(colSums(times), class = 'proc_time') 
+      attributes(results)$time <- total_time(results)
   }
   results
 }

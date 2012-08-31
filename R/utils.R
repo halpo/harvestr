@@ -47,5 +47,5 @@ use_method <- function(method, ...){
 #' @export
 total_time <- function(x){
     times <- sapply(x, attr, 'time')
-    sum(times['elapsed',])
+    structure(apply(times, 1, sum), class='proc_time')
 }

@@ -69,7 +69,11 @@ test_that('reap times results', {
     expect_that(with_option(reap(x, mean), harvestr.time=T), has_time)
 })
 
-
+test_that('harvest times results', {
+    x <- farm(3, runif(100))
+    expect_that(harvest(x, mean, time=T), has_time)
+    expect_that(with_option(harvest(x, mean), harvestr.time=T), has_time)
+})
 
 
 

@@ -1,3 +1,7 @@
+harvestr0.5.3
+-------------
+* Bug fix on timing for harvest, when explicitly specified.
+
 harvestr 0.5.2
 --------------
 * Bug fix for time option not carrying forward.
