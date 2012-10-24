@@ -131,7 +131,7 @@ function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
     cache <- structure(cache, 
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
-  f <- function(){fun(x,...)}
+  f <- function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
   withseed(seed, f, cache=cache, time=time)
 }
 
