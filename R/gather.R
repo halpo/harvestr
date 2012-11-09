@@ -156,9 +156,9 @@ function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
 #' @export
 farm <-
 function(seeds, expr, envir = parent.frame(), ...
-        , cache = getOption('harvestr.use.cache', FALSE)
-        , time  = getOption('harvestr.time', FALSE)
-        , .parallel = FALSE){
+        , cache     = getOption('harvestr.use.cache', FALSE)
+        , time      = getOption('harvestr.time'     , FALSE)
+        , .parallel = getOption('harvestr.parallel' , FALSE)){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
@@ -193,7 +193,8 @@ function(seeds, expr, envir = parent.frame(), ...
 #' @export
 harvest <-
 function(.list, fun, ...
-         , time  = getOption('harvestr.time', FALSE), .parallel=F) {
+        , time      = getOption('harvestr.time'     , FALSE)
+        , .parallel = getOption('harvestr.parallel' , FALSE)){
   results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
   if(time){
       attributes(results)$time <- total_time(results)
