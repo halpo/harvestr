@@ -84,5 +84,12 @@ test_that('caching in harvest using boot', {
     expect_equal(run1, run2)
     expect_true(noattr(t2[1] <= t1[1]))
 })
-
+test_that('caching with timing turned on', {
+    unlink(cache.dir, recursive=TRUE, force=TRUE)
+    x <- farm(10, rnorm(1e4), cache=T)
+    t1 <- system.time(run1 <- harvest(x, boot, var, 100, cache=T, time=T))
+    t2 <- system.time(run2 <- harvest(x, boot, var, 100, cache=T, time=T))
+    expect_equal(run1, run2)
+    expect_true(noattr(t2[1] <= t1[1]))
+})
 

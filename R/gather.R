@@ -131,7 +131,11 @@ function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
     cache <- structure(cache, 
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
-  f <- function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
+  f <- if(getOption('harvestr.use.try', TRUE)) {
+    function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
+  } else {
+    function(){fun(x,...)}
+  }
   withseed(seed, f, cache=cache, time=time)
 }
 
@@ -158,7 +162,7 @@ farm <-
 function(seeds, expr, envir = parent.frame(), ...
         , cache = getOption('harvestr.use.cache', FALSE)
         , time  = getOption('harvestr.time', FALSE)
-        , .parallel = FALSE){
+        , .parallel = getOption('harvestr.parallel', FALSE)){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
@@ -193,13 +197,29 @@ function(seeds, expr, envir = parent.frame(), ...
 #' @export
 harvest <-
 function(.list, fun, ...
-         , time  = getOption('harvestr.time', FALSE), .parallel=F) {
+         , time  = getOption('harvestr.time', FALSE)
+         , .parallel = getOption('harvestr.parallel', FALSE)) {
   results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
+  if(getOptions('harvestr.try.summary', TRUE)) try_summary(results)
   if(time){
       attributes(results)$time <- total_time(results)
   }
   results
 }
+
+is_try_error <- function(x)inherits(x, 'try-error')
+get_message <- function(e)attr(e, 'condition')$message
+try_summary <- function(results){
+    errors <- Filter(is_try_error, results)
+    if(length(errors)){
+        errors <- sapply(errors, get_message)
+        cat(sprintf("%d of %d (%3.2g%%) calls produced errors"
+                    , length(errors) , length(results)
+                    , length(errors) / length(results) * 100), "\n\n")
+        print(table(errors))
+    }
+}
+try_summary(results)
 
 #' Strip attributes from an object.
 #' 

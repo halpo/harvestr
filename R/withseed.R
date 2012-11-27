@@ -116,7 +116,7 @@ get.seed <- function(){
 #' @export
 replace.seed <- function(seed, delete=TRUE){
   if(is.null(seed)){
-    if(delete)
+    if(delete && exists('.Random.seed', envir=.GlobalEnv, inherits=FALSE))
       remove('.Random.seed', envir=.GlobalEnv)
   } else {
     assign('.Random.seed', noattr(seed), envir=.GlobalEnv) 
