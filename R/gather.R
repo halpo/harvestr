@@ -64,7 +64,7 @@ function(x, seed=get.seed(), ..., .starting=F){
         r <-
         seeds[[i]] <-  structure(nextRNGStream(r), RNGlevel='stream')
     }
-    seeds
+    structure(seeds, c('rng-seeds', 'list'))
   } else {
     stop("x must be either a list or integer")
   }
@@ -176,7 +176,10 @@ function(seeds, expr, envir = parent.frame(), ...
   if(time){
       attributes(results)$time <- total_time(results)
   }
-  results
+  structure( results
+           , 'function' = 'harvestr::farm'
+           , class = c('harvestr-datasets', 'list')
+           )
 }
 
 
@@ -200,11 +203,14 @@ function(.list, fun, ...
         , time      = getOption('harvestr.time'     , FALSE)
         , .parallel = getOption('harvestr.parallel' , FALSE)){
   results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
-  if(getOptions('harvestr.try.summary', TRUE)) try_summary(results)
+  if(getOption('harvestr.try.summary', TRUE)) try_summary(results)
   if(time){
       attributes(results)$time <- total_time(results)
   }
-  results
+  structure( results
+           , 'function' = 'harvestr::harvest'
+           , class = c('harvestr-results', 'list')
+           )
 }
 
 is_try_error <- function(x)inherits(x, 'try-error')
@@ -219,7 +225,7 @@ try_summary <- function(results){
         print(table(errors))
     }
 }
-try_summary(results)
+# try_summary(results)
 
 #' Strip attributes from an object.
 #' 
@@ -248,13 +254,15 @@ noattr <- noattributes <- function(x) {
 #' @export
 plant <-
 function(.list, seeds=gather(length(.list))) {
-  stopifnot(is.list(.list))
-  n <- length(.list)
-  stopifnot(n == length(seeds))
-  for(i in seq_len(n)){
-    attr(.list[[i]],'ending.seed') <- seeds[[i]]
-  }
-  return(.list)
+    if(inherits(.list, 'data.frame'))
+        .list <- mlply(.list, data.frame)
+    stopifnot(inherits(.list, 'list'))
+    n <- length(.list)
+    stopifnot(n == length(seeds))
+    for(i in seq_len(n)){
+        attr(.list[[i]],'ending.seed') <- seeds[[i]]
+    }
+    return(.list)
 }
 
 #' @rdname plant
@@ -270,3 +278,43 @@ function(.list, seeds=gather(length(.list))) {
 graft <-
 function(x, n, seeds = sprout(x, n)) 
     plant(replicate(length(seeds), x, F), seeds)
+
+    
+#' Apply over rows of a data frame
+#' 
+#' @param df  a data frame of parameters
+#' @param f   a function
+#' @param ... additional parameters
+#' 
+#' @ Return a list with f applied to each row of df.
+#' 
+#' @export
+plow  <-
+function(df, f, ..., seeds=gather()){
+    parameters <- plant(df)
+    harvest(parameters, splat(f), ...)
+}
+
+#' Combine results into a data frame
+#' 
+#' @param l a list, from a harvestr function.
+#' 
+#' @seealso ldply
+#' 
+#' @export
+bale <- 
+function(l, .check=T){
+    if(.check){
+        stopifnot( is_homo(l)
+                 , inherits(l, 'list')
+                 , length(l)
+                 )
+        if(!inherits(l, 'harvestr::results')
+            warning('bale is intended to be used with harvestr results but got a ', class(l))
+    }
+    ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else I)
+}
+
+
+
+
