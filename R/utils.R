@@ -25,6 +25,7 @@
 # 
 }###############################################################################
 
+
 #' Use a reference class method
 #' @param method name of the method to call
 #' @param ... additional arguments to pass along
@@ -49,3 +50,23 @@ total_time <- function(x){
     times <- sapply(x, attr, 'time')
     structure(apply(times, 1, sum), class='proc_time')
 }
+
+
+swap_args <- function(fun){
+    stopifnot(length( f <- formals(fun))>1)
+    f2 <- fun
+    formals(f2) <- 
+    f[c(2:1, seq_along(f)[-2:-1])]
+    f2
+}
+
+only1 <- function(.list){
+    all(.list==.list[1])
+}
+is_unity <- function(...)only1(list(...))
+is_homo <- function(.list){
+    classes <- lapply(.list, class)
+    only1(classes)
+}
+is_homogeneous <- function(...)is_homo(list(...))
+

@@ -64,4 +64,18 @@
 #' use file names derived from hashes of the expression to evaluate.  Do not
 #' modify the file names.
 #' 
+#' @section Options:
+#' The following options control behavior and default values for harvestr.
+#' \enumerate{
+#'   \item \code{harvestr.use.cache=FALSE} - Should results be cached for fault 
+#'         tollerance and accelerated reproducability?
+#'   \item \code{harvestr.cache.dir="harvestr-cache"} - The directory to use for
+#'          storing cached results.
+#'   \item \code{harvestr.time=FALSE} - Should results be timed?
+#'   \item \code{harvestr.use.try=TRUE} - Should the vectorized calls use try
+#'         to increase fault tollerance?
+#'   \item \code{harvestr.try.silent=FALSE} - Should try be run silently?
+#'   \item \code{harvestr.try.summary=TRUE} - Print a result if errors were found?
+#'   \item \code{harvestr.parallel=FALSE} - Run results in parallel?
+#' }
 NULL

@@ -64,7 +64,7 @@ function(x, seed=get.seed(), ..., .starting=F){
         r <-
         seeds[[i]] <-  structure(nextRNGStream(r), RNGlevel='stream')
     }
-    seeds
+    structure(seeds, c('rng-seeds', 'list'))
   } else {
     stop("x must be either a list or integer")
   }
@@ -131,7 +131,11 @@ function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
     cache <- structure(cache, 
       expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
   }
-  f <- function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
+  f <- if(getOption('harvestr.use.try', TRUE)) {
+    function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
+  } else {
+    function(){fun(x,...)}
+  }
   withseed(seed, f, cache=cache, time=time)
 }
 
@@ -172,7 +176,10 @@ function(seeds, expr, envir = parent.frame(), ...
   if(time){
       attributes(results)$time <- total_time(results)
   }
-  results
+  structure( results
+           , 'function' = 'harvestr::farm'
+           , class = c('harvestr-datasets', 'list')
+           )
 }
 
 
@@ -196,11 +203,29 @@ function(.list, fun, ...
         , time      = getOption('harvestr.time'     , FALSE)
         , .parallel = getOption('harvestr.parallel' , FALSE)){
   results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
+  if(getOption('harvestr.try.summary', TRUE)) try_summary(results)
   if(time){
       attributes(results)$time <- total_time(results)
   }
-  results
+  structure( results
+           , 'function' = 'harvestr::harvest'
+           , class = c('harvestr-results', 'list')
+           )
 }
+
+is_try_error <- function(x)inherits(x, 'try-error')
+get_message <- function(e)attr(e, 'condition')$message
+try_summary <- function(results){
+    errors <- Filter(is_try_error, results)
+    if(length(errors)){
+        errors <- sapply(errors, get_message)
+        cat(sprintf("%d of %d (%3.2g%%) calls produced errors"
+                    , length(errors) , length(results)
+                    , length(errors) / length(results) * 100), "\n\n")
+        print(table(errors))
+    }
+}
+# try_summary(results)
 
 #' Strip attributes from an object.
 #' 
@@ -229,13 +254,15 @@ noattr <- noattributes <- function(x) {
 #' @export
 plant <-
 function(.list, seeds=gather(length(.list))) {
-  stopifnot(is.list(.list))
-  n <- length(.list)
-  stopifnot(n == length(seeds))
-  for(i in seq_len(n)){
-    attr(.list[[i]],'ending.seed') <- seeds[[i]]
-  }
-  return(.list)
+    if(inherits(.list, 'data.frame'))
+        .list <- mlply(.list, data.frame)
+    stopifnot(inherits(.list, 'list'))
+    n <- length(.list)
+    stopifnot(n == length(seeds))
+    for(i in seq_len(n)){
+        attr(.list[[i]],'ending.seed') <- seeds[[i]]
+    }
+    return(.list)
 }
 
 #' @rdname plant
@@ -252,34 +279,43 @@ function(.list, seeds=gather(length(.list))) {
 graft <-
 function(x, n, seeds = sprout(x, n)) 
     plant(replicate(length(seeds), x, F), seeds)
+
     
-    
-    
-#' Plow a dataframe
+#' Apply over rows of a data frame
 #' 
-#' @param df a data frame of parameters
-#' @param fun the function to run
-#' @param ... other parameters not contained in df or other harvestr arguments
-#' @param .n the number of times to call fun for each row of df
-#' @param seeds the seeds for the rows of df.
+#' @param df  a data frame of parameters
+#' @param f   a function
+#' @param ... additional parameters
 #' 
-#' Plowing a data.fram is to perform the same action \code{.n} times
-#' for each row of a data.frame.
+#' @ Return a list with f applied to each row of df.
 #' 
-#' @return
-#' a list of length \code{nrow(df)}.  Each element is either an analysis
-#' or list of the results of fun.
-#' 
-#' @family harvest
 #' @export
-plow <- 
-function(df, fun=I, ..., .n=1, seeds=gather(nrow(df))){
-ldf <- plant(mlply(df, list), seeds)
-if(.n>1){
-    harvest(harvest(ldf, graft, n=.n), harvest, splat(fun), ...)
-} else {
-    harvest(ldf, splat(fun), ...)
+plow  <-
+function(df, f, ..., seeds=gather()){
+    parameters <- plant(df)
+    harvest(parameters, splat(f), ...)
 }
+
+#' Combine results into a data frame
+#' 
+#' @param l a list, from a harvestr function.
+#' 
+#' @seealso ldply
+#' 
+#' @export
+bale <- 
+function(l, .check=T){
+    if(.check){
+        stopifnot( is_homo(l)
+                 , inherits(l, 'list')
+                 , length(l)
+                 )
+        if(!inherits(l, 'harvestr::results')
+            warning('bale is intended to be used with harvestr results but got a ', class(l))
+    }
+    ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else I)
 }
-    
-    
+
+
+
+
