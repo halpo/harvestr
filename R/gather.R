@@ -247,7 +247,39 @@ function(.list, seeds=gather(length(.list))) {
 #' 
 #' @param x an objects that already has seeds.
 #' @param n number of seeds to create
+#' @family harvest
 #' @export
 graft <-
 function(x, n, seeds = sprout(x, n)) 
     plant(replicate(length(seeds), x, F), seeds)
+    
+    
+    
+#' Plow a dataframe
+#' 
+#' @param df a data frame of parameters
+#' @param fun the function to run
+#' @param ... other parameters not contained in df or other harvestr arguments
+#' @param .n the number of times to call fun for each row of df
+#' @param seeds the seeds for the rows of df.
+#' 
+#' Plowing a data.fram is to perform the same action \code{.n} times
+#' for each row of a data.frame.
+#' 
+#' @return
+#' a list of length \code{nrow(df)}.  Each element is either an analysis
+#' or list of the results of fun.
+#' 
+#' @family harvest
+#' @export
+plow <- 
+function(df, fun=I, ..., .n=1, seeds=gather(nrow(df))){
+ldf <- plant(mlply(df, list), seeds)
+if(.n>1){
+    harvest(harvest(ldf, graft, n=.n), harvest, splat(fun), ...)
+} else {
+    harvest(ldf, splat(fun), ...)
+}
+}
+    
+    
