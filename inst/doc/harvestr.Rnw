@@ -10,7 +10,7 @@
 << setup, results=hide>>=
 library(harvestr)
 library(plyr)
-library(lme4)
+library(MCMCpack)
 library(dostats)
 print.data.frame <- function(x, ...){
   print(ascii(df, include.rownames = FALSE), type = 'rest')
@@ -110,18 +110,16 @@ adply(coefs,2, dostats, mean, sd)
 \subsection{Example 2 - Stochastic Analysis}
 
 That is very nice, but rather simple as far ananalyses go. What might be
-more interesting is to perform an analysis with a random component to
-the analysis. We take this example from the \texttt{lme4} package.
+more interesting is to perform an analysis with a stochastic component such
+as Markov Chain Monte Carlo.
 
 <<stochastic, message=F, warning=F>>=
-library(lme4)
+library(MCMCpack)
 library(plyr)
-fm1 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), sleepstudy)
-samps <- farm(gather(10), mcmcsamp(fm1, n=1000))
-length(samps)
-matrices  <- harvest(harvest(samps, as.matrix), as.data.frame)
-Days      <- harvest(matrices, `[[`, "Days")
-densities <- harvest(Days, density)
+posteriors <- harvest(datasets, MCMCregress, formula=y~x)
+dataframes <- harvest(posteriors, as.data.frame)
+X.samples  <- harvest(dataframes, `[[`, "x")
+densities  <- harvest(X.samples, density)
 <<fig=T>>=
 plot(densities[[1]])
 l_ply(densities, lines)
@@ -134,10 +132,7 @@ To ease longer analyses with many steps caching is available.
 <<caching_run1>>=
 unlink("harvestr-cache", recursive=TRUE)  # reset cache
 system.time({
-  fm1 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject)
-             , sleepstudy)
-  samps <- farm(gather(10), mcmcsamp(fm1, n=1000), cache=T)
-  matrices  <- harvest(harvest(samps, as.matrix), as.data.frame, cache=T)
+    posteriors1 <- harvest(datasets, MCMCregress, formula=y~x, cache=TRUE)
 })
 @
 
@@ -145,10 +140,7 @@ and when we run it again.
 
 <<cache_run2>>=
 system.time({
-  fm1 <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject)
-             , sleepstudy)
-  samps <- farm(gather(10), mcmcsamp(fm1, n=1000), cache=T)
-  matrices  <- harvest(harvest(samps, as.matrix), as.data.frame, cache=T)
+    posteriors2 <- harvest(datasets, MCMCregress, formula=y~x, cache=TRUE)
 })
 @
 
