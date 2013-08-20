@@ -64,7 +64,7 @@ function(x, seed=get.seed(), ..., .starting=F){
         r <-
         seeds[[i]] <-  structure(nextRNGStream(r), RNGlevel='stream')
     }
-    structure(seeds, c('rng-seeds', 'list'))
+    structure(seeds, class=c('rng-seeds', 'list'))
   } else {
     stop("x must be either a list or integer")
   }
@@ -225,7 +225,6 @@ try_summary <- function(results){
         print(table(errors))
     }
 }
-# try_summary(results)
 
 #' Strip attributes from an object.
 #' 
@@ -283,22 +282,25 @@ function(x, n, seeds = sprout(x, n))
     
 #' Apply over rows of a data frame
 #' 
-#' @param df  a data frame of parameters
-#' @param f   a function
-#' @param ... additional parameters
+#' @param df    a data frame of parameters
+#' @param f     a function
+#' @param ...   additional parameters
+#' @param seeds seeds to use.
 #' 
-#' @ Return a list with f applied to each row of df.
+#' @return a list with f applied to each row of df.
 #' 
+#' @importFrom plyr splat
 #' @export
 plow  <-
-function(df, f, ..., seeds=gather()){
-    parameters <- plant(df)
+function(df, f, ..., seeds=gather(nrow(df))){
+    parameters <- plant(df, seeds=seeds)
     harvest(parameters, splat(f), ...)
 }
 
 #' Combine results into a data frame
 #' 
 #' @param l a list, from a harvestr function.
+#' @param .check should checks be run on the object.
 #' 
 #' @seealso ldply
 #' 
@@ -310,7 +312,7 @@ function(l, .check=T){
                  , inherits(l, 'list')
                  , length(l)
                  )
-        if(!inherits(l, 'harvestr::results')
+        if(!inherits(l, 'harvestr::results'))
             warning('bale is intended to be used with harvestr results but got a ', class(l))
     }
     ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else I)

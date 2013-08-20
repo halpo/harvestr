@@ -1,6 +1,9 @@
 harvestr 0.5.2
 --------------
 * Bug fix for time option not carrying forward.
+* Added plow function for calling with each row of a dataframe as parameters
+* Added Bale to combine back into a data.frame
+* Removed dependency on lme4, due to removed functionality.
 
 
 harvestr 0.5.1
