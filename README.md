@@ -1,9 +1,9 @@
-# The `harvestr` Parallel Simulation Framework.
+ï»¿# The `harvestr` Parallel Simulation Framework.
 The `harvestr` package is a framework for conducting replicable parallel 
 simulations in [R](http://www.r-project.org).  It builds off the 
 the popular [plyr](http://cran.r-project.org/?pacakge=plyr) 
 package for split apply combine framework, and the parallel combined 
-multiple-recursive generator’ from L'Ecuyer (1999).
+multiple-recursive generator from L'Ecuyer (1999).
 
 Due to the replicable simulations being based off seed values,this package takes a theme of seeds and farming.  The principal functions are as follows:
 
