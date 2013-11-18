@@ -25,6 +25,22 @@
 # 
 }###############################################################################
 
+#' Check if an object or list of objects has seed attributes
+#' 
+#' @param x an object or list to check
+#' 
+#' @export
+is_seeded <- function(x){
+    if(!is.null(attr(x, 'ending.seed'))) {
+        return(TRUE)
+    } else {
+        if(is.list(x)){
+            return(all(sapply(x, is_seeded)))
+        }
+    }
+    return(FALSE) 
+}
+
 
 #' Use a reference class method
 #' @param method name of the method to call
