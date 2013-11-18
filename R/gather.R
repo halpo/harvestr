@@ -50,8 +50,8 @@ function(x, seed=get.seed(), ..., .starting=F){
   on.exit(replace.seed(oldseed))
   if(is.list(x)){
     seeds <- lapply(x, attr, ifelse(.starting,"starting.seed", "ending.seed"))
-    if(any(sapply(seeds, is.null)))
-      stop("Malformed list.")
+    if(any(sapply(seeds, is.null))) stop("Malformed list.")
+    seeds
   } else if(is.numeric(x) && isTRUE(all.equal(x,ceiling(x)))){
     if(!is.null(seed)) {
         set.seed(seed, kind="L'Ecuyer-CMRG", normal.kind="Inversion")
