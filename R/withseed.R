@@ -43,13 +43,14 @@
 #' @seealso \code{\link{set.seed}}
 #' @export
 withseed <- function(seed, expr, envir=parent.frame()
-                    , cache = getOption('harvestr.use.cache', FALSE)
-                    , time  = getOption('harvestr.time', FALSE)){
+                    , cache     = getOption('harvestr.use.cache', FALSE)
+                    , cache.dir = getOption("harvestr.cache.dir", "harvestr-cache")
+                    , time      = getOption('harvestr.time', FALSE)
+                    ){
   oldseed <- get.seed()
   on.exit(replace.seed(oldseed))
   se <- substitute(expr)
   if(cache){
-    cache.dir <- getOption("harvestr.cache.dir", "harvestr-cache")
     expr.md5 <- attr(cache, 'expr.md5')
     parent.call <- sys.call(-1)[[1]]
     if(is.null(expr.md5)){

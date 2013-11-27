@@ -1,8 +1,8 @@
 Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
-Version: 0.5.2
-Date: 2013-08-19
+Version: 0.6.0
+Date: 2013-11-26
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy simulation and replicability.
