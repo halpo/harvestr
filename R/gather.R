@@ -122,21 +122,23 @@ sprout <- function(seed, n) {
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
-function(x, fun, ..., cache = getOption('harvestr.use.cache', FALSE)
-                    , time  = getOption('harvestr.time', FALSE)) {
+function( x, fun, ...
+        , hash      = digest(list(x, fun, ..., source="harvestr::reap"), "md5")
+        , cache     = getOption('harvestr.use.cache', FALSE)
+        , cache.dir = getOption("harvestr.cache.dir", "harvestr-cache")
+        , time      = getOption('harvestr.time', FALSE)) {
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
   if(cache){
-    cache <- structure(cache, 
-      expr.md5 = digest(list(x, fun, source="harvestr::reap"), "md5"))
+    cache <- structure(cache, expr.md5 = hash)
   }
   f <- if(getOption('harvestr.use.try', TRUE)) {
     function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
   } else {
     function(){fun(x,...)}
   }
-  withseed(seed, f, cache=cache, time=time)
+  withseed(seed, f, cache=cache, cache.dir=cache.dir, time=time)
 }
 
 #' Evaluate an expression for a set of seeds.
