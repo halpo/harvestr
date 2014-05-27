@@ -27,11 +27,12 @@
 
 #' Do a computation with a given seed.
 #' @rdname seed_funs
-#' @param seed  a valid seed value
-#' @param expr expression to evaluate.
-#' @param envir the \code{\link{environment}} to evaluate the code in. 
-#' @param cache should results be cached or retrieved from cache.
-#' @param time should results be timed?
+#' @param seed      a valid seed value
+#' @param expr      expression to evaluate.
+#' @param envir     the \code{\link{environment}} to evaluate the code in. 
+#' @param cache     should results be cached or retrieved from cache.
+#' @param cache.dir Where should cached results be saved to/retrieve from.
+#' @param time      should results be timed?
 #' 
 #' @details
 #' Compute the expr with the given seed, replacing the global seed after compuatations

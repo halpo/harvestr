@@ -113,11 +113,13 @@ sprout <- function(seed, n) {
 #' 
 #' The function calling works the same as the \link{apply} family of functions.
 #' 
-#' @param x an object
-#' @param fun a function to call on object
-#' @param ... passed onto function
-#' @param cache use cache, see Caching in \code{\link{harvestr}}
-#' @param time should results be timed?
+#' @param x         an object
+#' @param fun       a function to call on object
+#' @param ...       passed onto function
+#' @param hash      hash of the list to retrieve the cache from.
+#' @param cache     use cache, see Caching in \code{\link{harvestr}}
+#' @param cache.dir directory for the cache.
+#' @param time      should results be timed?
 #' 
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export

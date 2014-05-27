@@ -77,7 +77,7 @@ swap_args <- function(fun){
 }
 
 only1 <- function(.list){
-    all(.list==.list[1])
+    all(.list == .list[[1]])
 }
 is_unity <- function(...)only1(list(...))
 is_homo <- function(.list){
