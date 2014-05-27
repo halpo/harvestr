@@ -1,3 +1,8 @@
+harvestr 0.6.0
+--------------
+* made cache.dir configurable at call level.
+* added `is_seeded` function.
+
 harvestr 0.5.2
 --------------
 * Bug fix for time option not carrying forward.
