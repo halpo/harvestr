@@ -314,7 +314,7 @@ function(l, .check=T){
     if(.check){
         stopifnot( is_homo(l)
                  , inherits(l, 'list')
-                 , length(l)
+                 , length(l)>0
                  )
         if(!inherits(l, 'harvestr::results'))
             warning('bale is intended to be used with harvestr results but got a ', class(l))
