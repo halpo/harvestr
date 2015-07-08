@@ -126,9 +126,10 @@ sprout <- function(seed, n) {
 reap <-
 function( x, fun, ...
         , hash      = digest(list(x, fun, ..., source="harvestr::reap"), "md5")
-        , cache     = getOption('harvestr.use.cache', FALSE)
-        , cache.dir = getOption("harvestr.cache.dir", "harvestr-cache")
-        , time      = getOption('harvestr.time', FALSE)) {
+        , cache     = getOption('harvestr.use.cache', defaults$cache())
+        , cache.dir = getOption("harvestr.cache.dir", defaults$cache.dir())
+        , time      = getOption('harvestr.time'     , defaults$time())
+        ) {
   seed <- attr(x, "ending.seed")
   if(is.null(seed))
     stop("Could not find a seed value associated with x")
@@ -163,10 +164,12 @@ function( x, fun, ...
 #' @family harvest
 #' @export
 farm <-
-function(seeds, expr, envir = parent.frame(), ...
-        , cache     = getOption('harvestr.use.cache', FALSE)
-        , time      = getOption('harvestr.time'     , FALSE)
-        , .parallel = getOption('harvestr.parallel' , FALSE)){
+function( seeds, expr, envir = parent.frame(), ...
+        , cache     = getOption('harvestr.use.cache', defaults$cache()    )
+        , time      = getOption('harvestr.time'     , defaults$time()     )
+        , .parallel = getOption('harvestr.parallel' , defaults$parallel() )
+        , .progress = getOption('harvestr.progress' , defaults$progress() )
+        ){
   if(is.numeric(seeds) && length(seeds)==1)
     seeds <- gather(seeds)
   fun <- if(is.name(substitute(expr)) && is.function(expr)){
@@ -176,7 +179,8 @@ function(seeds, expr, envir = parent.frame(), ...
     substitute(expr)
   }
   results <- llply(.data=seeds, .fun=withseed, fun, envir=envir, ...
-                  , cache=cache, time=time, .parallel=.parallel)
+                  , cache=cache, time=time
+                  , .parallel=.parallel, .progress=.progress)
   if(time){
       attributes(results)$time <- total_time(results)
   }
@@ -204,8 +208,10 @@ function(seeds, expr, envir = parent.frame(), ...
 #' @export
 harvest <-
 function(.list, fun, ...
-        , time      = getOption('harvestr.time'     , FALSE)
-        , .parallel = getOption('harvestr.parallel' , FALSE)){
+        , time      = getOption('harvestr.time'     , defaults$time()     )
+        , .parallel = getOption('harvestr.parallel' , defaults$parallel() )
+        , .progress = getOption('harvestr.progress' , defaults$progress() )
+        ){
   results <- llply(.list, reap, fun, ..., time =time,  .parallel=.parallel)
   if(getOption('harvestr.try.summary', TRUE)) try_summary(results)
   if(time){
@@ -319,7 +325,7 @@ function(l, .check=T){
         if(!inherits(l, 'harvestr::results'))
             warning('bale is intended to be used with harvestr results but got a ', class(l))
     }
-    ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else I)
+    ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else as.data.frame)
 }
 
 

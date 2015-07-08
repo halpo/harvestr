@@ -72,10 +72,11 @@
 #'   \item \code{harvestr.cache.dir="harvestr-cache"} - The directory to use for
 #'          storing cached results.
 #'   \item \code{harvestr.time=FALSE} - Should results be timed?
-#'   \item \code{harvestr.use.try=TRUE} - Should the vectorized calls use try
+#'   \item \code{harvestr.use.try=!\link{interactive}()} - Should the vectorized calls use try
 #'         to increase fault tollerance?
 #'   \item \code{harvestr.try.silent=FALSE} - Should try be run silently?
 #'   \item \code{harvestr.try.summary=TRUE} - Print a result if errors were found?
-#'   \item \code{harvestr.parallel=FALSE} - Run results in parallel?
+#'   \item \code{harvestr.parallel} - Run results in parallel? Default is to run in parallel if a parallel back end is registered and the call is the uppermost harvestr call.
+#'   \item \code{harvestr.progress} - Use a progress bar?  Default is to show a bar in interactive mode for top level call, but the type is platform dependent.
 #' }
 NULL

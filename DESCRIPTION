@@ -22,4 +22,5 @@ Collate:
     'withseed.R'
     'gather.R'
     'harvestr-package.R'
+    'option.R'
     'utils.R'
