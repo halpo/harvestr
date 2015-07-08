@@ -10,6 +10,7 @@ function(){
     any(!sapply(frames, is_harvestr_frame))
 }
 
+#' @importFrom foreach getDoParRegistered
 dflt_harvestr_parallel <- 
 function(){
     if(is_top_harvestr_call())

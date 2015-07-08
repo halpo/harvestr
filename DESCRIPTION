@@ -10,12 +10,12 @@ License: GPL(>= 2)
 Imports:
     parallel,
     plyr,
-    digest
+    digest,
+    foreach
 Suggests:
     testthat,
     dostats,
     doParallel,
-    foreach,
     MCMCpack,
     boot
 Collate:

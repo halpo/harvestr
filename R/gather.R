@@ -159,6 +159,7 @@ function( x, fun, ...
 #' @param cache should cached results be used or generated?
 #' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
+#' @param .progress Show a progress bar?
 #' 
 #' @importFrom plyr llply ldply
 #' @family harvest
@@ -197,6 +198,7 @@ function( seeds, expr, envir = parent.frame(), ...
 #' @param ... passed to \code{fun}
 #' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
+#' @param .progress Show a progress bar?
 #' 
 #' @details
 #' harvest is functionaly equivalant to llply, but takes on additional capability when used

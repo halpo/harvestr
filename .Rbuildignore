@@ -4,3 +4,4 @@ experiments
 ^\.Rproj\.user$
 .*\.Rproj
 libpeerconnection.log
+\.geany
