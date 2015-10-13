@@ -238,19 +238,6 @@ try_summary <- function(results){
     }
 }
 
-#' Strip attributes from an object.
-#' 
-#' @param x, any object
-#' @seealso \link{attributes}
-#' @export
-noattr <- noattributes <- function(x) {
-  if(is.list(x)){
-    x <- llply(x, noattributes)
-  }
-  attributes(x) <- NULL
-  x
-}
-
 #' Assign elements of a list with seeds
 #' @param .list a list to set seeds on
 #' @param seeds to plant from \code{\link{gather}} or \code{\link{sprout}}
