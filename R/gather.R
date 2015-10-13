@@ -62,7 +62,11 @@ function(x, seed=get.seed(), ..., .starting=F){
     seeds <- vector('list', x)
     for(i in seq_len(x)) {
         r <-
-        seeds[[i]] <-  structure(nextRNGStream(r), RNGlevel='stream')
+        seeds[[i]] <-  
+            structure( nextRNGStream(r)
+                     , RNGlevel='stream'
+                     , class=c("rng-seed", "integer")
+                     )
     }
     structure(seeds, class=c('rng-seeds', 'list'))
   } else {
@@ -251,11 +255,18 @@ try_summary <- function(results){
 #' @family harvest
 #' @export
 plant <-
-function(.list, seeds=gather(length(.list))) {
+function(.list
+        , ...
+        , seeds = gather(length(.list), ...)
+        ) {
     if(inherits(.list, 'data.frame'))
         .list <- mlply(.list, data.frame)
     stopifnot(inherits(.list, 'list'))
     n <- length(.list)
+    if(!inherits(seeds, "rng-seeds")){
+        stopifnot(inherits(seeds, numeric))
+        seeds <- gather(n, seed=seeds)
+    }
     stopifnot(n == length(seeds))
     for(i in seq_len(n)){
         attr(.list[[i]],'ending.seed') <- seeds[[i]]
@@ -285,13 +296,14 @@ function(x, n, seeds = sprout(x, n))
 #' @param f     a function
 #' @param ...   additional parameters
 #' @param seeds seeds to use.
+#' @param seed  passed to gather to generate seeds.
 #' 
 #' @return a list with f applied to each row of df.
 #' 
 #' @importFrom plyr splat
 #' @export
 plow  <-
-function(df, f, ..., seeds=gather(nrow(df))){
+function(df, f, ..., seed=get.seed(), seeds=gather(nrow(df), seed=seed)){
     parameters <- plant(df, seeds=seeds)
     harvest(parameters, splat(f), ...)
 }

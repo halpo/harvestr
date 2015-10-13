@@ -1,6 +1,7 @@
 harvestr 0.7.0
 --------------
 * Added getAttr for retrieving attributes with a default similar to getOption.
+* plow and plant allow for specifying a single seed that will be used to generate other seeds.
 
 harvestr 0.6.0
 --------------
