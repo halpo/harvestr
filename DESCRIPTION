@@ -1,7 +1,7 @@
 Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
-Version: 0.6.0
+Version: 0.7.0
 Date: 2014-05-27
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
@@ -19,6 +19,7 @@ Suggests:
     MCMCpack,
     boot
 Collate:
+    'attributes.R'
     'withseed.R'
     'gather.R'
     'harvestr-package.R'

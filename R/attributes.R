@@ -14,7 +14,7 @@ noattr <- noattributes <- function(x) {
 #' Retrieve an attribute or a default if not present.
 #' 
 #' Behaves similar to \code{\link{getOption}}, but is a simple wrapper
-#' for \code{\link{attr}.
+#' for \code{\link{attr}}.
 #' 
 #' 
 #' @param object    An R Object.
