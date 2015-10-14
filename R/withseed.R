@@ -68,8 +68,6 @@ withseed <- function(seed, expr, envir=parent.frame()
       return(result)
     }
   }
-  # RNGkind("L'Ecuyer-CMRG", "Inversion")
-  # set.seed(seed, "L'Ecuyer-CMRG", "Inversion")
   replace.seed(seed)
   fun <- if(is.name(se)){
     if(is.function(expr)){
@@ -85,9 +83,11 @@ withseed <- function(seed, expr, envir=parent.frame()
   }
   if(time) start.time <- proc.time()
   result <- fun()
+  ending.seed <- get.seed()
+  attributes(ending.seed) <- attributes(seed) # will carry forward things like RNGStream level.
   result <- structure(result,
     starting.seed = seed,
-    ending.seed   = get.seed(),
+    ending.seed   = ending.seed,
     time=if(time)structure(proc.time() - start.time, class = "proc_time"))
   if(cache){
     if(!file.exists(cache.dir)) dir.create(cache.dir)
