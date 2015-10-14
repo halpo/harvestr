@@ -1,13 +1,13 @@
-\documentclass{article}
-\usepackage[margin=.7in]{geometry}
-%\VignetteIndexEntry{harvestr}
+---
+title:  Using `harvestr` for replicable simulations
+author: Andrew Redd
+...
 
-\title{Using \texttt{harvestr} for replicable simulations}
-\author{Andrew Redd}
+<!--
+\VignetteEngine{knitr::knitr}
+-->
 
-
-\newcommand{\rsetupcapture}{
-<< setup, results=hide>>=
+```{r  setup, results=hide, messages=FALSE, warnings=FALSE}
 library(harvestr)
 library(plyr)
 library(MCMCpack)
@@ -15,58 +15,51 @@ library(dostats)
 print.data.frame <- function(x, ...){
   print(ascii(df, include.rownames = FALSE), type = 'rest')
 }
-@
-}
-\begin{document}
-\subsection{Introduction}
+```
 
-The \texttt{harvestr} package is a new approach to simulation studies
+# Introduction
+
+The `harvestr` package is a new approach to simulation studies
 that facilitates parallel execution. It builds off the structures
-available in the \texttt{plyr}, \texttt{foreach} and \texttt{rsprng}
-packages. What \texttt{harvestr} brings to the picture is abstractions
+available in the `plyr`, `foreach` and `rsprng`
+packages. What `harvestr` brings to the picture is abstractions
 of the process of performing simulation.
 
-\subsection{Process}
+# Process
 
-The theme of \texttt{harvestr} is that of gardening, stemming from the
+The theme of `harvestr` is that of gardening, stemming from the
 idea that the pseudo-random numbers generated (RNG) in replicable
 simulation come from initial states called seeds. Figure 1 shows the
-basic process for \texttt{harvestr}.
+basic process for `harvestr`.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics{c0bfeebb.pdf}
-\caption{The basic \texttt{harvestr} process}
-\end{figure}
+
+(workflow.png)[The basic `harvestr` process]
+
 
 The ideas are simple.
 
-\begin{enumerate}
-\item
-  \texttt{gather(n, {[}seed{]})} takes an integer for the number of
+* `gather(n, {[`seed{]})} takes an integer for the number of
   seeds to generate.\\ Optionally, the seed can be set for replicable
-  simulations. This uses the \texttt{rsprng} library to initialize
+  simulations. This uses the `rsprng` library to initialize
   independent parallel random number streams.
-\item
-  The seeds that are returned from \texttt{gather} are then fed into the
-  \texttt{farm} function along with an expression to be generate data.
-  \texttt{farm} returns a list of data frames each independently
+* The seeds that are returned from `gather` are then fed into the
+  `farm` function along with an expression to be generate data.
+  `farm` returns a list of data frames each independently
   generated under each of the rng streams.
-\item
-  The final step is to apply a function to analyze the data. This is
-  done with the \texttt{harvest} command, which takes the data from
-  \texttt{farm} and applies an analysis function to the dataset. In the
-  case that the analysis is deterministic \texttt{harvest} is equivalant
-  to \texttt{llply} from the \texttt{plyr} package. The difference is
+* The final step is to apply a function to analyze the data. This is
+  done with the `harvest` command, which takes the data from
+  `farm` and applies an analysis function to the dataset. In the
+  case that the analysis is deterministic `harvest` is equivalant
+  to `llply` from the `plyr` package. The difference is
   with stochastic analysis, such as Markov Chain Monte Carlo (MCMC),
-  where \texttt{harvest} resumes the RNG stream where \texttt{farm} left
+  where `harvest` resumes the RNG stream where `farm` left
   off when generating the data.
-\end{enumerate}
+
 The effect is the results can be taken in any order and independently,
 and the final results are the same as if each analysis was taken from
 start to end with setting a single seed for each stream.
 
-\subsection{Example 1 - Basic Example}
+## Example 1 - Basic Example
 
 Some learn best by example. Here I will show a simple example for the
 basic process. Here we will perform simple linear regression for 100
@@ -74,78 +67,77 @@ data sets. First off we gather the seeds. This step is separate to
 facilitate storing the seeds to be distributed along with research if
 necessary.
 
-<<ex1-setup>>=
+```{r ex1-setup}
 library(harvestr)
 library(plyr)
 seeds <- gather(100, seed=12345)
-@
+```
 
 Second, we generate the data.
 
-<<ex1-generate_data>>=
+```{r ex1-generate_data}
 datasets <- farm(seeds, {
   x <- rnorm(100)
   y <- rnorm(100, mean=x)
   data.frame(y,x)
 })
-@
+```
 
 Then we analyze the data.
 
-<<r ex1-analysis>>=
+```{r r ex1-analysis}
 analyses <-  harvest(datasets, lm)
-@
+```
 
-So what do we have in \texttt{analyses}? We have whatever \texttt{lm}
-returned. In this case we have a list of \texttt{lm} objects containg
+So what do we have in `analyses`? We have whatever `lm`
+returned. In this case we have a list of `lm` objects containg
 the results of a linear regression. Ussually we will want to do more to
 summarize the results.
 
-<<ex1-summarize>>=
+```{r ex1-summarize}
 library(dostats)
 coefs <- t(sapply(analyses, coef))
 adply(coefs,2, dostats, mean, sd)
-@
+```
 
-\subsection{Example 2 - Stochastic Analysis}
+## Example 2 - Stochastic Analysis
 
 That is very nice, but rather simple as far ananalyses go. What might be
 more interesting is to perform an analysis with a stochastic component such
 as Markov Chain Monte Carlo.
 
-<<stochastic, message=F, warning=F>>=
+```{r stochastic, message=F, warning=F}
 library(MCMCpack)
 library(plyr)
 posteriors <- harvest(datasets, MCMCregress, formula=y~x)
 dataframes <- harvest(posteriors, as.data.frame)
 X.samples  <- harvest(dataframes, `[[`, "x")
 densities  <- harvest(X.samples, density)
-<<fig=T>>=
+```{r fig=T}
 plot(densities[[1]])
 l_ply(densities, lines)
-@
+```
 
-\subsection{Example 3 - Caching}
+## Example 3 - Caching
 
 To ease longer analyses with many steps caching is available.
 
-<<caching_run1>>=
+```{r caching_run1}
 unlink("harvestr-cache", recursive=TRUE)  # reset cache
 system.time({
     posteriors1 <- harvest(datasets, MCMCregress, formula=y~x, cache=TRUE)
 })
-@
+```
 
 and when we run it again.
 
-<<cache_run2>>=
+```{r cache_run2}
 system.time({
     posteriors2 <- harvest(datasets, MCMCregress, formula=y~x, cache=TRUE)
 })
-@
+```
 
 
-To maintain integrity \texttt{harvestr} functions take use
-\texttt{digest} to create hashes of the seed, data, and function so that
+To maintain integrity `harvestr` functions take use
+`digest` to create hashes of the seed, data, and function so that
 if any element changes, out of data cache results will not be used.
-\end{document}

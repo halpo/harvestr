@@ -17,8 +17,10 @@ Suggests:
     dostats,
     doParallel,
     MCMCpack,
+    knitr,
     boot
 Collate:
+    'Interactive.R'
     'attributes.R'
     'withseed.R'
     'gather.R'

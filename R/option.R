@@ -23,7 +23,7 @@ function(){
 
 dflt_harvestr_progress <-
 function(){
-    if(interactive() && is_top_harvestr_call()){
+    if(Interactive() && is_top_harvestr_call()){
         if(.Platform$OS.type == "windows") return("win")
         else return("time")
     }
