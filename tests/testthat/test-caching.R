@@ -66,10 +66,10 @@ test_that("caching in farm with mean of rnorm", {
     expect_identical(run1, run2)
 })  
 test_that("caching in reap with long sample", {
-    seed <- gather(1)[[1]]
+    seed <- gather(1)
     unlink(cache.dir, recursive=TRUE, force=TRUE)
     long_sample <- compose(head, sample)
-    x <- plant( list(1:1e7), list(seed))[[1]]
+    x <- plant( list(1:1e7), seed)[[1]]
     t1 <- system.time(run1 <- reap(x, long_sample, cache=T))
     t2 <- system.time(run2 <- reap(x, long_sample, cache=T))
     expect_true(all(t2[1] <= t1[1]))

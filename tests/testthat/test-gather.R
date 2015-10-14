@@ -62,10 +62,10 @@ test_that('farm is indifferent to order.', {
     expect_equivalent(e,g)
 })
 test_that("reap is reproducible", {
-    seed <- gather(1)[[1]]
-    x <- plant(list(1:10), list(seed))[[1]]
+    seed <- gather(1)
+    x <- plant(list(1:10), seed)[[1]]
     a <- reap(x, sample)
-    b <- withseed(seed, sample(1:10))
+    b <- withseed(seed[[1]], sample(1:10))
     expect_identical(a,b)
     expect_identical(reap(a, sample), reap(a, sample))
 })
