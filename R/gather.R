@@ -99,12 +99,13 @@ sprout <- function(seed, n) {
         warning(paste('RNG seed provided si already a substream seed,'
                      ,'independence of streams not guaranteed.'))
     }
-    
     seeds <- replicate(n, simplify=FALSE, {
-        seed <<- structure(nextRNGSubStream(seed)
-                          , RNGlevel = 'substream')
+        seed <<- structure( nextRNGSubStream(seed)
+                          , class    = c('rng-seed', 'integer')
+                          , RNGlevel = 'substream'
+                          )
     }) 
-    seeds
+    structure(seeds, class=c('rng-seeds', 'list'))
 }
 
 #' Call a function continuing the random number stream.
@@ -244,6 +245,7 @@ try_summary <- function(results){
 
 #' Assign elements of a list with seeds
 #' @param .list a list to set seeds on
+#' @param ...   passed to gather to generate seeds.
 #' @param seeds to plant from \code{\link{gather}} or \code{\link{sprout}}
 #'
 #' @description
@@ -256,15 +258,15 @@ try_summary <- function(results){
 #' @export
 plant <-
 function(.list
-        , ...
         , seeds = gather(length(.list), ...)
+        , ...
         ) {
     if(inherits(.list, 'data.frame'))
         .list <- mlply(.list, data.frame)
     stopifnot(inherits(.list, 'list'))
     n <- length(.list)
     if(!inherits(seeds, "rng-seeds")){
-        stopifnot(inherits(seeds, numeric))
+        stopifnot(inherits(seeds, "numeric"))
         seeds <- gather(n, seed=seeds)
     }
     stopifnot(n == length(seeds))
