@@ -307,7 +307,8 @@ function(x, n, seeds = sprout(x, n))
 plow  <-
 function(df, f, ..., seed=get.seed(), seeds=gather(nrow(df), seed=seed)){
     parameters <- plant(df, seeds=seeds)
-    harvest(parameters, splat(f), ...)
+    structure( harvest(parameters, splat(f), ...)
+             , "function" ="harvestr::plow"
 }
 
 #' Combine results into a data frame
