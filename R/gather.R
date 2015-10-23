@@ -334,7 +334,7 @@ function(l, .check=T){
                  , inherits(l, 'list')
                  , length(l)>0
                  )
-        if(!inherits(l, 'harvestr::results'))
+        if(!inherits(l, 'harvestr-results'))
             warning('bale is intended to be used with harvestr results but got a ', class(l))
     }
     ldply(l, if(inherits(l[[1]], 'harvestr-results')) bale else as.data.frame)
