@@ -305,10 +305,18 @@ function(x, n, seeds = sprout(x, n))
 #' @importFrom plyr splat
 #' @export
 plow  <-
-function(df, f, ..., seed=get.seed(), seeds=gather(nrow(df), seed=seed)){
+function( df, f, ...
+        , seed=get.seed(), seeds=gather(nrow(df), seed=seed)
+        , .parallel = 
+        , time      = getOption('harvestr.time'     , defaults$time()     )
+        , .parallel = getOption('harvestr.parallel' , defaults$parallel() )
+        , .progress = getOption('harvestr.progress' , defaults$progress() )
+       ){
     parameters <- plant(df, seeds=seeds)
-    structure( harvest(parameters, splat(f), ...)
-             , "function" ="harvestr::plow"
+    structure( harvest( parameters, splat(f), ...
+                      , .parallel=.parallel, .progress=.progress, time=time
+                      )
+             , "function" ="harvestr::plow")
 }
 
 #' Combine results into a data frame
