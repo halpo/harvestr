@@ -7,6 +7,10 @@ sudo: false
 r_packages:
     - covr
     - roxygen2
+    - parallel
+    - plyr
+    - digest
+    - foreach
 before_script:
     - Rscript -e 'roxygen2::roxygenise(".")'
 
