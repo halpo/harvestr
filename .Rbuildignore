@@ -5,3 +5,4 @@ experiments
 .*\.Rproj
 libpeerconnection.log
 \.geany
+\.travis.yml
