@@ -1,4 +1,9 @@
 ﻿# The `harvestr` Parallel Simulation Framework.
+[![Travis-CI Build Status](https://travis-ci.org/halpo/harvestr.svg?branch=master)](https://travis-ci.org/halpo/harvestr)
+[![Coverage Status](https://img.shields.io/codecov/c/github/halpo/harvestr/master.svg)](https://codecov.io/github/halpo/harvestr?branch=master)
+[![CRAN version](http://www.r-pkg.org/badges/version/harvestr)](https://cran.r-project.org/package=harvestr)
+
+
 The `harvestr` package is a framework for conducting replicable parallel 
 simulations in [R](http://www.r-project.org).  It builds off the 
 the popular [plyr](http://cran.r-project.org/?pacakge=plyr) 
