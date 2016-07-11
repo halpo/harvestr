@@ -16,7 +16,7 @@ function(){
     if(is_top_harvestr_call())
         return(getDoParRegistered())
     frames <- sys.frames()
-    harvestr.frames <- filter(is_harvestr_frame, frames)
+    harvestr.frames <- Filter(is_harvestr_frame, frames)
     has.parallel <- sapply(harvestr.frames, exists, x=".parallel", where=-1, inherits=FALSE)
     return(get(envir=harvestr.frames[has.parallel][[1]], ".parallel") - 1)
 }

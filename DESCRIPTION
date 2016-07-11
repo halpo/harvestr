@@ -11,7 +11,8 @@ Imports:
     parallel,
     plyr,
     digest,
-    foreach
+    foreach,
+    stats
 Suggests:
     testthat,
     dostats,
@@ -27,3 +28,4 @@ Collate:
     'harvestr-package.R'
     'option.R'
     'utils.R'
+RoxygenNote: 5.0.1

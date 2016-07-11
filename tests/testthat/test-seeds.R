@@ -4,13 +4,13 @@ context("seeds")
 test_that("get.seed retrieves properly", {
     set.seed(123, "L'Ecuyer-CMRG", "Inversion")
     seed  <- get.seed()
-    eseed <- c(407L
+    eseed <- structure(c(407L
         , 1806547166L
         , -983674937L 
         ,  643431772L 
         , 1162448557L 
         , -959247990L 
-        , -133913213L)
+        , -133913213L), class=c('rng-seed', 'integer'))
     expect_identical(seed, eseed)
 })
 test_that("replace.seed", {
@@ -49,8 +49,8 @@ test_that("withseed replaces previous seed.", {
     a <- withseed(seed, get.seed())
     k <- get.seed()
     expect_identical(l,k)
-    expect_equivalent(a, noattr(attr(a, 'starting.seed')))
-    expect_equivalent(a, noattr(attr(a, 'ending.seed')))
+    expect_equivalent(a, attr(a, 'starting.seed'))
+    expect_equivalent(a, attr(a, 'ending.seed'))
     expect_false(identical(l, noattr(a)))
     expect_false(isTRUE(all.equal(a, l)))
     expect_identical(RNGkind(), c("Mersenne-Twister", "Box-Muller"))

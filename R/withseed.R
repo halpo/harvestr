@@ -89,7 +89,7 @@ withseed <- function(seed, expr, envir=parent.frame()
         starting.seed = seed,
         ending.seed   = ending.seed,
         time=if(time)structure(proc.time() - start.time, class = "proc_time"))
-    if(cache){
+    if(cache && !inherits(result, 'try-error')){
         if(!file.exists(cache.dir)) dir.create(cache.dir)
         save(result, file=cache.file)
     }
@@ -134,14 +134,16 @@ replace.seed <- function(seed, delete=TRUE){
 #' Useful for grabbing a seed used to generate a random object.
 #' 
 #' @return a valid .Random.seed value.
+#' @importFrom stats runif
 GetOrSetSeed<-function(){
-  if(is.null(get.seed())) runif(1)
+  if(is.null(get.seed())) stats::runif(1)
   seed <- .Random.seed
 	seed
 }
 
 
 #' @export
+#' @importFrom utils head tail 
 `format.rng-seed` <- 
 function( x
         , ...

@@ -29,20 +29,12 @@ context("Timing")
 has_attr <- function(name, class='any'){
     function(x){
         a <- attributes(x)
-        if(name %in% names(a)){
-            if(class == 'any') {
-                expectation(T, '')
-            } else {
-                if(inherits(a[[name]], class)) {
-                    expectation(T, '')
-                } else {
-                    expectation(F, sprintf("has '%s' attribute but it is not of class '%s'."
-                            , name, class))
-                }
-            }
-        } else {
-            expectation(F, sprintf("does not have a '%s' attribute", name))
-        }
+        if(!(name %in% names(a))) 
+            expect(FALSE, sprintf("Does not have '%s' attribute", name))
+        if(class != 'any' && ! inherits(a[[name]], class))
+            expect(FALSE,
+            sprintf("has '%s' attribute but it is not of class '%s'."
+                   , name, class))
     }
 }
 has_time <- has_attr('time', 'proc_time')
@@ -55,8 +47,8 @@ with_option <- function (code, ...) {
 
 test_that("withseed times results", {
     seed <- gather(1)[[1]]
-    expect_that(withseed(seed, runif(1), time=T), has_time)
-    expect_that(with_option(withseed(seed, runif(1)), harvestr.time=T), has_time)
+    expect_that(withseed(seed, runif(1), time=TRUE), has_time)
+    expect_that(with_option(withseed(seed, runif(1)), harvestr.time=TRUE), has_time)
 })
 test_that('farm times results', {
     seeds <- gather(3)
@@ -68,23 +60,8 @@ test_that('reap times results', {
     expect_that(reap(x, mean, time=TRUE), has_time)
     expect_that(with_option(reap(x, mean), harvestr.time=T), has_time)
 })
-
 test_that('harvest times results', {
     x <- farm(3, runif(100))
     expect_that(harvest(x, mean, time=T), has_time)
     expect_that(with_option(harvest(x, mean), harvestr.time=T), has_time)
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
