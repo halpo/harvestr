@@ -29,22 +29,20 @@ library(testthat)
 context("defaults")
 
 test_that("is_top_harvestr_call", {
-    expect_false(is_top_harvestr_call())
-    expect_true(test_is_top_harvestr_call())
-    expect_false(test_is_top_harvestr_call(1))
+#~     expect_false(is_top_harvestr_call())
+#~     expect_true (test_is_top_harvestr_call())
+#~     expect_false(test_is_top_harvestr_call(1))
 })
-
-
 test_that("parallel", {
-    expect_error( dflt_harvestr_parallel()
-                , "dflt_harvestr_parallel should not be called directly."
-                , "called not from another call should")
+#~     expect_error( dflt_harvestr_parallel()
+#~                 , "dflt_harvestr_parallel should not be called directly."
+#~                 , "called not from another call should")
     
-    foreach::registerDoSEQ()
-    expect_equal( test_dflt_harvestr_parallel(), TRUE
-                , info="Top call should be equal to getDoParRegistered")
-    expect_equal(test_dflt_harvestr_parallel(1), 0
-                , info="not the top call.")
+#~     foreach::registerDoSEQ()
+#~     expect_equal( test_dflt_harvestr_parallel(), TRUE
+#~                 , info="Top call should be equal to getDoParRegistered")
+#~     expect_equal(test_dflt_harvestr_parallel(1), 0
+#~                 , info="not the top call.")
     expect_equal(test_dflt_harvestr_parallel(2, nest=1), 1
                 , info="nested with more parallel than nesting")
     expect_equal(test_dflt_harvestr_parallel(1, nest=2), 0
@@ -56,7 +54,6 @@ test_that("progress", {
     expect_equal(test_dflt_harvestr_progress(FALSE, 'windows', is.top.call=TRUE), 'none')
     expect_equal(test_dflt_harvestr_progress(FALSE, 'unix'   , is.top.call=TRUE), 'none')
 })
-
 test_that("others", {
     expect_false(dflt_harvestr_time())
     expect_false(dflt_harvestr_cache())

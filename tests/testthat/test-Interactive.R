@@ -44,7 +44,7 @@ test_that("Interactive exclusions", {
     expect_true (test_Interactive(is.interactive = TRUE, is.knitting=FALSE, NULL))
     expect_false(test_Interactive(is.interactive =FALSE, is.knitting=FALSE, NULL))
     expect_false(test_Interactive(is.interactive = TRUE, is.knitting= TRUE, NULL))
-    expect_false(test_Interactive(is.interactive = TRUE, is.knitting=FALSE, 'test_Interactive'))
+    expect_false(test_Interactive(is.interactive = TRUE, is.knitting=FALSE, list(test_Interactive)))
 })
 
 
