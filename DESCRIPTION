@@ -19,7 +19,8 @@ Suggests:
     doParallel,
     MCMCpack,
     knitr,
-    boot
+    boot,
+    withr
 Collate:
     'Interactive.R'
     'attributes.R'

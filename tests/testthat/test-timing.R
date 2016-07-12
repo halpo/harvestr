@@ -24,8 +24,11 @@
  # dostats. If not, see http://www.gnu.org/licenses/.
  # 
 }###############################################################################
-
+library(testthat)
+library(harvestr)
+foreach::registerDoSEQ()
 context("Timing")
+
 has_attr <- function(name, class='any'){
     function(x){
         a <- attributes(x)
@@ -52,16 +55,16 @@ test_that("withseed times results", {
 })
 test_that('farm times results', {
     seeds <- gather(3)
-    expect_that(farm(seeds, runif(10), time=T), has_time)
-    expect_that(with_option(farm(seeds, runif(10)), harvestr.time=T), has_time)
+    expect_that(farm(seeds, runif(10), time=TRUE, .progress='none', .parallel=FALSE), has_time)
+    expect_that(with_option(farm(seeds, runif(10), .progress='none', .parallel=FALSE), harvestr.time=T), has_time)
 })
 test_that('reap times results', {
-    x <- farm(1, runif(100))[[1]]
+    x <- farm(1, runif(100), .progress='none', .parallel=FALSE)[[1]]
     expect_that(reap(x, mean, time=TRUE), has_time)
     expect_that(with_option(reap(x, mean), harvestr.time=T), has_time)
 })
 test_that('harvest times results', {
-    x <- farm(3, runif(100))
-    expect_that(harvest(x, mean, time=T), has_time)
-    expect_that(with_option(harvest(x, mean), harvestr.time=T), has_time)
+    x <- farm(3, runif(100), .progress='none', .parallel=FALSE)
+    expect_that(harvest(x, mean, time=TRUE, .progress='none', .parallel=FALSE), has_time)
+    expect_that(with_option(harvest(x, mean, .progress='none', .parallel=FALSE), harvestr.time=T), has_time)
 })

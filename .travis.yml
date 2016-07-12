@@ -11,6 +11,7 @@ r_packages:
     - plyr
     - digest
     - foreach
+    - knitr
 before_script:
     - Rscript -e 'roxygen2::roxygenise(".")'
 

@@ -85,3 +85,27 @@ test_that('withseed handles passed expressions', {
     expect_that(length(a), equals(10))
     expect_that(all(0<=a & a<=1), is_true())
 })
+test_that('is_seeded', {
+    x <- plant(list(1))
+    expect_false(is_seeded(NULL))
+    expect_true(is_seeded(x))
+    expect_true(is_seeded(x[[1]]))
+})
+
+test_that('swap_args', {
+    f <- function(a=1, b=2){a**b}
+    g <- swap_args(f)
+    
+    expect_equal(formals(g), pairlist(b=2, a=1))
+})
+
+test_that('homogeneity', {
+    expect_true (only1(list(a=1, b=1)))
+    expect_false(only1(list(a=1, b=2)))
+    expect_true (is_unity(a=1, b=1))
+    expect_false(is_unity(a=1, b=2))
+    expect_true (is_homo(list(a=1, b=2 )))
+    expect_false(is_homo(list(a=1, b=2L)))
+    expect_true (is_homogeneous(a=1, b=2 ))
+    expect_false(is_homogeneous(a=1, b=2L))
+})

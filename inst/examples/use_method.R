@@ -22,8 +22,8 @@ objs <- mlply(p, mr$new)
 # plant seeds to prep objects for harvest
 objs <- plant(objs)
 # run methods on objects
-talk <- harvest(objs, use_method(babble))
+talk <- harvest(objs, use_method(babble), .progress='none', .parallel=FALSE)
 unlist(talk)
 # and to show reproducibility
-more.talk <- harvest(objs, use_method(babble))
+more.talk <- harvest(objs, use_method(babble), .progress='none', .parallel=FALSE)
 identical(unlist(talk), unlist(more.talk))
