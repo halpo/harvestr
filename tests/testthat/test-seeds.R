@@ -109,3 +109,34 @@ test_that('homogeneity', {
     expect_true (is_homogeneous(a=1, b=2 ))
     expect_false(is_homogeneous(a=1, b=2L))
 })
+test_that("remove seed", {
+    runif(1)
+    replace.seed(NULL)
+    expect_false(exists('.Random.seed', envir=.GlobalEnv))  
+})
+
+
+test_that('get.seed', {
+    replace.seed(NULL)
+    expect_null(a <- get.seed())
+    seed <- gather(1)[[1]]
+})
+test_that("GetOrSetSeed", {
+    replace.seed(NULL)
+    seed <- GetOrSetSeed()
+    expect_is(seed, 'integer')
+})
+
+test_that('printing seeds', {
+    seeds <- gather(3)
+    
+    expect_match(format(seeds), "L'Ecuyer-CMRG<[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+>")
+    expect_output(print(seeds), "L'Ecuyer-CMRG<[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+>")
+    
+    expect_match(format(seeds[[1]]), "L'Ecuyer-CMRG<[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+>")
+    expect_output(print(seeds[[1]]), "L'Ecuyer-CMRG<[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+/[0-9A-F]+>")
+    
+    expect_output(print(gather(100)), "\\+ 94 more,  100 in total.")
+})
+
+

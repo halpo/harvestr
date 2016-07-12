@@ -37,4 +37,14 @@ test_that("called from", {
 test_that("Interactive", {
     expect_equal(Interactive(), interactive())
 })
+test_that("Interactive exclusions", {
+    test_Interactive <- function(...){Interactive_core(...)}
+    
+    
+    expect_true (test_Interactive(is.interactive = TRUE, is.knitting=FALSE, NULL))
+    expect_false(test_Interactive(is.interactive =FALSE, is.knitting=FALSE, NULL))
+    expect_false(test_Interactive(is.interactive = TRUE, is.knitting= TRUE, NULL))
+    expect_false(test_Interactive(is.interactive = TRUE, is.knitting=FALSE, 'test_Interactive'))
+})
+
 
