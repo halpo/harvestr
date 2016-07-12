@@ -105,10 +105,10 @@ get.seed <- function(){
   if(exists(".Random.seed", envir=.GlobalEnv, mode="numeric")) {
     seed <- get(".Random.seed", envir=.GlobalEnv, inherits=FALSE)
     class(seed) <- c("rng-seed", "integer")
+    seed
   } else {
     NULL
   }
-  seed
 }
 
 #' @rdname seed_funs
@@ -180,7 +180,7 @@ function( x                 #< [rng-seeds] object
     o <- format(x, ...)
     if(length(o)>max.length){
         print(head(o, show.length))
-        cat("+", length(o) - 6, "more, ", length(o), "in total.")
+        cat("+", length(o) - 6, "more, ", length(o), "in total.\n")
     } else {
         print(o)
     }

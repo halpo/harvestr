@@ -5,30 +5,44 @@ is_harvestr_frame <- function(env){
 }
 
 is_top_harvestr_call <-
-function(){
-    frames <- sys.frames()
-    any(!sapply(frames, is_harvestr_frame))
+function(n=0){
+    frames <- head(sys.frames(), -1-n)
+    sum(sapply(frames, is_harvestr_frame))==1
 }
+test_is_top_harvestr_call <- function(...){is_top_harvestr_call(...)}
 
 #' @importFrom foreach getDoParRegistered
 dflt_harvestr_parallel <- 
 function(){
-    if(is_top_harvestr_call())
+    if(is_top_harvestr_call()) 
+        stop("dflt_harvestr_parallel should not be called directly.")
+    if(is_top_harvestr_call(1))
         return(getDoParRegistered())
     frames <- sys.frames()
     harvestr.frames <- Filter(is_harvestr_frame, frames)
     has.parallel <- sapply(harvestr.frames, exists, x=".parallel", where=-1, inherits=FALSE)
-    return(get(envir=harvestr.frames[has.parallel][[1]], ".parallel") - 1)
+    if(!any(has.parallel)) return(FALSE)
+    return(max(get(envir=harvestr.frames[has.parallel][[1]], ".parallel") - 1, 0))
+}
+test_dflt_harvestr_parallel <- function(.parallel=0, nest=.parallel){
+    if(nest>0) return(Recall(.parallel=.parallel, nest= nest-1))
+    dflt_harvestr_parallel()
 }
 
+
 dflt_harvestr_progress <-
-function(){
-    if(Interactive() && is_top_harvestr_call()){
-        if(.Platform$OS.type == "windows") return("win")
+function( is.interactive = Interactive()
+        , OS             = .Platform$OS.type
+        , is.top.call    = is_top_harvestr_call(1)
+        ){
+    if( is.interactive && is.top.call){
+        if( OS == "windows") 
+            return("win")
         else return("time")
     }
     return("none")
 }
+test_dflt_harvestr_progress <- function(...){dflt_harvestr_progress(...)}
 
 dflt_harvestr_time      <- function(){ FALSE }
 dflt_harvestr_cache     <- function(){ FALSE }

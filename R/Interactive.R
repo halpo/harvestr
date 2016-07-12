@@ -40,16 +40,23 @@ function(){
 #' You can also specify functions to exclude in the option
 #' \code{harvestr::Interactive::exclude}
 #' 
-#' @param ... functions to pass to \code{\link{called_from}}
+#' @param exclude.calls functions to pass to \code{\link{called_from}}
 #' 
 #' @export
 Interactive <-
-function(...){
-    interactive() &&
-    !is_knitting() && 
-    !called_from(..., .First.sys) && 
-    if(!is.null(.e <- getOption("harvestr::Interactive::exclude"))){
-        !called_from(FUNS=.e)
-    } else TRUE
+function(exclude.calls=getOption("harvestr::Interactive::exclude")){
+    Interactive_core(exclude.calls=exclude.calls)
 }
 
+Interactive_core <- 
+function( is.interactive = interactive()
+        , is.knitting    = is_knitting()
+        , exclude.calls  = getOption("harvestr::Interactive::exclude")
+        ){
+    is.interactive &&
+    !is.knitting && 
+    !called_from(.First.sys) && 
+    if(!is.null(exclude.calls)){
+        !called_from(FUNS=exclude.calls)
+    } else TRUE
+}
