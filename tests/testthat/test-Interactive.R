@@ -33,6 +33,8 @@ test_that("testing is_knitting", {
 test_that("called from", {
     expect_false(called_from(stats::rnorm))
     expect_true(called_from(test_that))
+    expect_false(called_from('rnorm'))
+    expect_true(called_from('expect_true'))
 })
 test_that("Interactive", {
     expect_equal(Interactive(), interactive())
