@@ -6,3 +6,5 @@ experiments
 libpeerconnection.log
 \.geany
 \.travis.yml
+^cran-comments\.md$
+^CONDUCT\.md$

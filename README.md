@@ -45,3 +45,8 @@ The Parallel backends are platform limited read the individual packages document
   * [doMPI](http://cran.r-project.org/?package=doMPI)
   * [doRedis](http://cran.r-project.org/?package=doRedis)
   * [doSNOW](http://cran.r-project.org/?package=doSNOW)
+
+# Notes #
+
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+
