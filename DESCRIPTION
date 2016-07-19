@@ -5,7 +5,7 @@ Version: 0.7.0
 Date: 2014-05-27
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
-Description: Functions for easy simulation and reproducibility.
+Description: Functions for easy and reproducible simulation.
 License: GPL(>= 2)
 Imports:
     parallel,
