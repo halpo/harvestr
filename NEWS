@@ -1,3 +1,7 @@
+harvestr 0.7.1
+--------------
+* Updated DESCRIPTION and Vignette sources to build vignettes.
+
 harvestr 0.7.0
 --------------
 * Added getAttr for retrieving attributes with a default similar to getOption.

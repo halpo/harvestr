@@ -1,12 +1,13 @@
 Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
-Version: 0.7.0
+Version: 0.7.1
 Date: 2016-07-19
 Author: Andrew Redd
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy and reproducible simulation.
 License: GPL(>= 2)
+VignetteBuilder: knitr
 Imports:
     parallel,
     plyr,
