@@ -9,3 +9,4 @@ libpeerconnection.log
 ^cran-comments\.md$
 ^CONDUCT\.md$
 revdep
+^README\.md$

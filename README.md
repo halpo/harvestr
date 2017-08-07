@@ -35,16 +35,16 @@ See the `plyr` and `foreach` packages documentation for what backends are curren
 
 ## Operating Systems ##
 `harvestr` is limited in it's capabilities by the packages that it depends on, mainly 
-[foreach](http://cran.r-project.org/package=foreach)
-and [plyr](http://cran.r-project.org/package=plyr)
+[foreach](https://cran.r-project.org/package=foreach)
+and [plyr](https://cran.r-project.org/package=plyr)
 The Parallel backends are platform limited read the individual packages documentation:
  
-  * [doMC](http://cran.r-project.org/?package=doMC)
-  * [doSMP](http://cran.r-project.org/?package=doSMP)
-  * [doParallel](http://cran.r-project.org/?package=doParallel)
-  * [doMPI](http://cran.r-project.org/?package=doMPI)
-  * [doRedis](http://cran.r-project.org/?package=doRedis)
-  * [doSNOW](http://cran.r-project.org/?package=doSNOW)
+  * [doMC](https://cran.r-project.org/?package=doMC)
+  * [doSMP](https://cran.r-project.org/?package=doSMP)
+  * [doParallel](https://cran.r-project.org/?package=doParallel)
+  * [doMPI](https://cran.r-project.org/?package=doMPI)
+  * [doRedis](https://cran.r-project.org/?package=doRedis)
+  * [doSNOW](https://cran.r-project.org/?package=doSNOW)
 
 # Notes #
 
