@@ -1,3 +1,7 @@
+harvestr 0.7.2
+--------------
+* updated tests to decrease chance of random failure.
+
 harvestr 0.7.1
 --------------
 * Updated DESCRIPTION and Vignette sources to build vignettes.

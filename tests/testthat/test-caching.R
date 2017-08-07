@@ -31,7 +31,8 @@ library(boot)
 foreach::registerDoSEQ()
 context("Caching")
 
-cache.dir <- normalizePath(file.path(tempdir(), "harvestr-cache"), mustWork=F)
+
+cache.dir <- normalizePath(file.path(tempdir(), "harvestr-cache"), mustWork=FALSE)
 options(harvestr.cache.dir=cache.dir)
 reg.finalizer(emptyenv(), function(...){unlink(cache.dir, TRUE)}, onexit=TRUE)
 
@@ -69,12 +70,13 @@ test_that("caching in farm with mean of rnorm", {
 test_that("caching in reap with long sample", {
     seed <- gather(1)
     unlink(cache.dir, recursive=TRUE, force=TRUE)
+    dir.create(cache.dir, recursive=TRUE)
     long_sample <- compose(head, sample)
     x <- plant( list(1e8), seed)[[1]]
-    t1 <- system.time(run1 <- reap(x, long_sample, cache=TRUE))
-    t2 <- system.time(run2 <- reap(x, long_sample, cache=TRUE))
-    expect_true(all(t2['user'] <= t1['user']))
-    expect_identical(run1, run2)    
+    t1 <- system.time(run1 <- reap(x, long_sample, cache=TRUE, time=FALSE))
+    t2 <- system.time(run2 <- reap(x, long_sample, cache=TRUE, time=FALSE))
+    expect_true(all(t2['user.self'] <= t1['user.self']), info="Rum time is faster in second call.")
+    expect_identical(run1, run2, info="Runs are identical.")    
     unlink(cache.dir, recursive=TRUE, force=TRUE)
 })
 test_that('caching in harvest using boot', {
