@@ -70,10 +70,10 @@ test_that("caching in reap with long sample", {
     seed <- gather(1)
     unlink(cache.dir, recursive=TRUE, force=TRUE)
     long_sample <- compose(head, sample)
-    x <- plant( list(1:1e7), seed)[[1]]
+    x <- plant( list(1e8), seed)[[1]]
     t1 <- system.time(run1 <- reap(x, long_sample, cache=TRUE))
     t2 <- system.time(run2 <- reap(x, long_sample, cache=TRUE))
-    expect_true(all(t2[1] <= t1[1]))
+    expect_true(all(t2['user'] <= t1['user']))
     expect_identical(run1, run2)    
     unlink(cache.dir, recursive=TRUE, force=TRUE)
 })
