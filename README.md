@@ -20,10 +20,10 @@ Due to the replicable simulations being based off seed values,this package takes
   * `graft` - splits RNG sub-streams from a main object.
   * `sprout` -  gets the seeds for use in `graft`.
 
-##Lists##
+## Lists ##
 All of the functions work off lists, They expect and return lists, which can be easily converted to data frames.  I would do this with `ldply(list, I)`. 
 
-##Parallel##
+## Parallel ##
 The advantage of setting the seeds like this is that parallelization is seamless and transparent, similar to the `plyr` framework each function has a `.parallel` argument, which defaults to `FALSE`, but when set to true will evaluate and run in parallel.  An appropriate parallel backend must be specified.  For example, with a multicore backend you would run the following code.
 
 ```r
