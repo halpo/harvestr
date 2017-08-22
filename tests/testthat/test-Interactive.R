@@ -26,6 +26,7 @@
 }###############################################################################
 library(harvestr)
 library(testthat)
+oo <- options( "harvestr::Interactive::exclude" = NULL)
 context("Interactive")
 test_that("testing is_knitting", {
     expect_false(is_knitting())
@@ -49,4 +50,4 @@ test_that("Interactive exclusions", {
     expect_false(test_Interactive(is.interactive = TRUE, is.knitting=FALSE, list(test_Interactive)))
 })
 
-
+options(oo)
