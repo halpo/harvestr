@@ -117,7 +117,56 @@ test_that("bale errors", {
     expect_error(bale(list()))
     expect_warning(bale(list(a=1, b=2)))
 })
+test_that("sprout warning", {
+    set.seed(20170823)
+    seed <- gather(1)[[1]]
+    seed2 <- sprout(seed, 10)
+    
+    expect_warning( sprout(seed2[[1]], 10)
+                  , "RNG seed provided is already a substream seed, independence of streams not guaranteed."
+                  )
+})
+test_that("reap parameter use.try", {
+    oo <- options(harvestr.try.silent = TRUE)
+    seed <- gather(1)
+    x <- plant(list(rnorm), seed)[[1]]
+    expect_silent(a <- reap(x, sample, use.try=TRUE))
+    expect_is(a, "try-error")
+    
+    expect_error(a <- reap(x, sample, use.try=FALSE))
 
+    options(oo)
+})
+test_that("farm checks function arguments", {
+    seeds <- gather(10, seed = 20170823)
+    expect_error(x <- farm(seeds, rnorm))
+})
+test_that("try_summary", {
+    oo <- options( warn=2
+                 , harvestr.use.try     = TRUE
+                 , harvestr.try.silent  = TRUE
+                 , harvestr.try.summary = FALSE
+                 )
+    seeds <- gather(10, seed = 20170824)
+    a <- farm(seeds, rnorm(1))
+    b <- harvest(a, rnorm, n=10, mean=0, use.try=TRUE)
+    
+    expect_output( try_summary(b)
+                 , "6 of 10 \\( 60%\\) calls produced errors"
+                 )
 
-
+    options(oo)
+})
+test_that("plant something besides seeds", {
+    expect_error( plant(as.list(letters), LETTERS)
+                , 'inherits\\(seeds, "numeric"\\) is not TRUE'
+                )
+})
+test_that("branch", {
+    x <- farm(gather(3, seed=20170825), rnorm(1))
+    y <- 1:3
+    
+    results <- branch(rnorm, x[[1]], y, n=100, time=TRUE)
+    expect_is(results, "harvestr-results")
+})
 

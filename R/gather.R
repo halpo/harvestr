@@ -96,7 +96,7 @@ sprout <- function(seed, n) {
     if(!is.null(es)) seed <- es
     rng.level <- attr(seed, 'RNGlevel')
     if(!is.null(rng.level) && rng.level == 'substream') {
-        warning(paste('RNG seed provided si already a substream seed,'
+        warning(paste('RNG seed provided is already a substream seed,'
                      ,'independence of streams not guaranteed.'))
     }
     seeds <- replicate(n, simplify=FALSE, {
@@ -144,7 +144,7 @@ function( x, fun, ...
     cache <- structure(cache, expr.md5 = hash)
   }
   f <- if(use.try) {
-    function(){try(fun(x,...), getOption('harvestr.try.silent', FALSE))}
+    function(){try(fun(x,...), silent=getOption('harvestr.try.silent', FALSE))}
   } else {
     function(){fun(x,...)}
   }
@@ -311,12 +311,13 @@ function( fun  #< function to apply to x and y[i]
     #! function is called as `fun(x,y)`
 
     buds   <- graft(x, seeds=seeds)
-    shoots <- mapply(list, x=buds, y, ...)
+    shoots <- t(mapply(list, x=buds, y, ..., SIMPLIFY=TRUE))
 
     results <- 
-        llply( shoots, reap, fun, time =time
-             ,  .parallel=.parallel
-             , .progress=.progress
+        mlply( shoots, .fun=reap, fun=fun
+             , time       = time
+             , .parallel  = .parallel
+             , .progress  = .progress
              )
     if(getOption('harvestr.try.summary', TRUE)) try_summary(results)
     if(time){
