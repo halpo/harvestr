@@ -1,13 +1,13 @@
 ---
 title:  Using `harvestr` for replicable simulations
 author: Andrew Redd
+vignette: >
+  %\VignetteIndexEntry{Using harvestr for replicable simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ...
 
-<!--
-\VignetteEngine{knitr::knitr}
--->
-
-```{r  setup, results=hide, messages=FALSE, warnings=FALSE}
+```{r  setup, results='hide', messages=FALSE, warnings=FALSE}
 library(harvestr)
 library(plyr)
 library(MCMCpack)

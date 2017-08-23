@@ -20,10 +20,10 @@ Due to the replicable simulations being based off seed values,this package takes
   * `graft` - splits RNG sub-streams from a main object.
   * `sprout` -  gets the seeds for use in `graft`.
 
-##Lists##
+## Lists ##
 All of the functions work off lists, They expect and return lists, which can be easily converted to data frames.  I would do this with `ldply(list, I)`. 
 
-##Parallel##
+## Parallel ##
 The advantage of setting the seeds like this is that parallelization is seamless and transparent, similar to the `plyr` framework each function has a `.parallel` argument, which defaults to `FALSE`, but when set to true will evaluate and run in parallel.  An appropriate parallel backend must be specified.  For example, with a multicore backend you would run the following code.
 
 ```r
@@ -35,13 +35,18 @@ See the `plyr` and `foreach` packages documentation for what backends are curren
 
 ## Operating Systems ##
 `harvestr` is limited in it's capabilities by the packages that it depends on, mainly 
-[foreach](http://cran.r-project.org/package=foreach)
-and [plyr](http://cran.r-project.org/package=plyr)
+[foreach](https://cran.r-project.org/package=foreach)
+and [plyr](https://cran.r-project.org/package=plyr)
 The Parallel backends are platform limited read the individual packages documentation:
  
-  * [doMC](http://cran.r-project.org/?package=doMC)
-  * [doSMP](http://cran.r-project.org/?package=doSMP)
-  * [doParallel](http://cran.r-project.org/?package=doParallel)
-  * [doMPI](http://cran.r-project.org/?package=doMPI)
-  * [doRedis](http://cran.r-project.org/?package=doRedis)
-  * [doSNOW](http://cran.r-project.org/?package=doSNOW)
+  * [doMC](https://cran.r-project.org/?package=doMC)
+  * [doSMP](https://cran.r-project.org/?package=doSMP)
+  * [doParallel](https://cran.r-project.org/?package=doParallel)
+  * [doMPI](https://cran.r-project.org/?package=doMPI)
+  * [doRedis](https://cran.r-project.org/?package=doRedis)
+  * [doSNOW](https://cran.r-project.org/?package=doSNOW)
+
+# Notes #
+
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+

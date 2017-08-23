@@ -131,9 +131,9 @@ sprout <- function(seed, n) {
 #' @export
 reap <-
 function( x, fun, ...
-        , hash      = digest(list(x, fun, ..., source="harvestr::reap"), "md5")
+        , hash      = digest(list(x, fun, ..., source="harvestr::reap"), algo="md5")
         , cache     = getOption('harvestr.use.cache', defaults$cache())
-        , cache.dir = getOption("harvestr.cache.dir", defaults$cache.dir())
+        , cache.dir = getOption('harvestr.cache.dir', defaults$cache.dir())
         , time      = getOption('harvestr.time'     , defaults$time())
         , use.try   = getOption('harvestr.use.try'  , !interactive())
         ) {

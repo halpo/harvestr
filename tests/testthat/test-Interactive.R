@@ -26,6 +26,7 @@
 }###############################################################################
 library(harvestr)
 library(testthat)
+oo <- options( "harvestr::Interactive::exclude" = NULL)
 context("Interactive")
 test_that("testing is_knitting", {
     expect_false(is_knitting())
@@ -33,6 +34,8 @@ test_that("testing is_knitting", {
 test_that("called from", {
     expect_false(called_from(stats::rnorm))
     expect_true(called_from(test_that))
+    expect_false(called_from('rnorm'))
+    expect_true(called_from('expect_true'))
 })
 test_that("Interactive", {
     expect_equal(Interactive(), interactive())
@@ -47,4 +50,4 @@ test_that("Interactive exclusions", {
     expect_false(test_Interactive(is.interactive = TRUE, is.knitting=FALSE, list(test_Interactive)))
 })
 
-
+options(oo)

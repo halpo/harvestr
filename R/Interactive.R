@@ -9,7 +9,6 @@ function( ...  #< functions to consider
         , FUNS=list(...) #< passed as a list
         ){
     stopifnot( missing(FUNS) || length(list(...)) == 0 )
-    if(is.character(FUNS))
     if(any(.i <- sapply(FUNS, is.character))){
         FUNS[.i] <- lapply(FUNS[.i], match.fun)
     }
@@ -31,6 +30,7 @@ function(){
         called_from(knitr::knit)
     } else FALSE
 }
+
 
 #' Smarter interactive test
 #' 

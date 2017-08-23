@@ -9,7 +9,6 @@ function(n=0){
     frames <- head(sys.frames(), -1-n)
     sum(sapply(frames, is_harvestr_frame))==1
 }
-test_is_top_harvestr_call <- function(...){is_top_harvestr_call(...)}
 
 #' @importFrom foreach getDoParRegistered
 dflt_harvestr_parallel <- 
