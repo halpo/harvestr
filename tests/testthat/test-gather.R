@@ -28,7 +28,14 @@ library(testthat)
 library(plyr)
 foreach::registerDoSEQ()
 context("main functions")
-options(harvestr.time=FALSE)
+options( harvestr.time=FALSE 
+       , "harvestr::Interactive::exclude" = NULL
+       , "harvestr.use.cache"   = NULL
+       , "harvestr.cache.dir"   = NULL
+       , "harvestr.use.try"     = NULL
+       , "harvestr.progress"    = 'none'
+       , "harvestr.parallel"    = FALSE
+       )
 
 test_that("gather is replicable", {
     seeds  <- gather(10, seed=1234)
@@ -149,7 +156,12 @@ test_that("try_summary", {
                  )
     seeds <- gather(10, seed = 20170824)
     a <- farm(seeds, rnorm(1))
-    b <- harvest(a, rnorm, n=10, mean=0, use.try=TRUE)
+    random_failure <- function(a){
+        if(a < 0) stop("Sorry it failed.")
+        "everything is good"
+    }
+    
+    b <- harvest(a, random_failure, use.try=TRUE)
     
     expect_output( try_summary(b)
                  , "6 of 10 \\( 60%\\) calls produced errors"
