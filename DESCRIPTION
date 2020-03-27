@@ -1,9 +1,13 @@
 Package: harvestr
 Type: Package
 Title: A Parallel Simulation Framework
-Version: 0.7.2
-Date: 2016-08-29
-Author: Andrew Redd
+Version: 0.8.0
+Authors@R: 
+    person(given = "Andrew",
+           family = "Redd",
+           role = c("aut", "cre"),
+           email = "andrew.redd@hsc.utah.edu",
+           comment = c(ORCID = "0000-0002-6149-2438"))
 Maintainer: Andrew Redd <andrew.redd@hsc.utah.edu>
 Description: Functions for easy and reproducible simulation.
 License: GPL(>= 2)
@@ -30,4 +34,4 @@ Collate:
     'harvestr-package.R'
     'option.R'
     'utils.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2

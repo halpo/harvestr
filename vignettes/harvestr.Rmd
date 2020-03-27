@@ -12,9 +12,6 @@ library(harvestr)
 library(plyr)
 library(MCMCpack)
 library(dostats)
-print.data.frame <- function(x, ...){
-  print(ascii(df, include.rownames = FALSE), type = 'rest')
-}
 ```
 
 # Introduction
@@ -68,9 +65,7 @@ facilitate storing the seeds to be distributed along with research if
 necessary.
 
 ```{r ex1-setup}
-library(harvestr)
-library(plyr)
-seeds <- gather(100, seed=12345)
+seeds <- gather(25, seed=12345)
 ```
 
 Second, we generate the data.
@@ -95,9 +90,8 @@ the results of a linear regression. Ussually we will want to do more to
 summarize the results.
 
 ```{r ex1-summarize}
-library(dostats)
-coefs <- t(sapply(analyses, coef))
-adply(coefs,2, dostats, mean, sd)
+coefs <- Reduce(rbind, lapply(analyses, coef))
+apply(coefs, 2, dostats, mean, sd)
 ```
 
 ## Example 2 - Stochastic Analysis
@@ -113,6 +107,7 @@ posteriors <- harvest(datasets, MCMCregress, formula=y~x)
 dataframes <- harvest(posteriors, as.data.frame)
 X.samples  <- harvest(dataframes, `[[`, "x")
 densities  <- harvest(X.samples, density)
+```
 ```{r fig=T}
 plot(densities[[1]])
 l_ply(densities, lines)

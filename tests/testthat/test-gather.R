@@ -1,34 +1,34 @@
 {###############################################################################
 # test=gather.R
 # This file is part of the R package harvestr.
-# 
+#
 # Copyright 2012 Andrew Redd
 # Date: 6/2/2012
-# 
+#
 # DESCRIPTION
 # ===========
 # unit testing for gather and other process flow functions.
-# 
+#
 # LICENSE
 # ========
 # harvestr is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software 
-# Foundation, either version 3 of the License, or (at your option) any later 
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
 # version.
-# 
-# dostats is distributed in the hope that it will be useful, but WITHOUT ANY 
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+#
+# This file is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along with 
-# dostats. If not, see http://www.gnu.org/licenses/.
-# 
+#
+# You should have received a copy of the GNU General Public License along with
+# this file. If not, see http://www.gnu.org/licenses/.
+#
 }###############################################################################
 library(testthat)
 library(plyr)
 foreach::registerDoSEQ()
 context("main functions")
-options( harvestr.time=FALSE 
+options( harvestr.time=FALSE
        , "harvestr::Interactive::exclude" = NULL
        , "harvestr.use.cache"   = NULL
        , "harvestr.cache.dir"   = NULL
@@ -46,8 +46,8 @@ test_that("gather gives the appropriate kinds of seed.", {
     .l <- gather(1)
     seed <- .l[[1]]
     replace.seed(seed)
-    expect_identical(RNGkind(), c("L'Ecuyer-CMRG", "Inversion"))
-    
+    expect_identical(head(RNGkind(), 2), c("L'Ecuyer-CMRG", "Inversion"))
+
     x <- plant(list(1), seeds=.l)
     expect_equivalent(gather(x), .l)
 })
@@ -61,7 +61,7 @@ test_that("gather replaces seed.", {
     seeds <- gather(10)
     k <- get.seed()
     expect_identical(l,k)
-    expect_identical(RNGkind(), c("Mersenne-Twister", "Box-Muller"))
+    expect_identical(head(RNGkind(), 2), c("Mersenne-Twister", "Box-Muller"))
 })
 test_that("farm is replicable", {
     seeds <- gather(10)
@@ -109,14 +109,14 @@ test_that("using with", {
 test_that("plow & bale", {
     df <- data.frame(rep=1:10, n=100)
     rngs <- plow(df[-1], rnorm, .parallel=FALSE)
-    
+
     expect_is(rngs, "harvestr-results")
-    
+
     means <- harvest(rngs, mean, .parallel=FALSE, .progress='none')
     expect_is(means, "harvestr-results")
-    
+
     df.means <- bale(means)
-    expect_is(df.means, "data.frame")    
+    expect_is(df.means, "data.frame")
 })
 test_that("bale errors", {
     expect_error(bale(list(1, TRUE)))
@@ -128,7 +128,7 @@ test_that("sprout warning", {
     set.seed(20170823)
     seed <- gather(1)[[1]]
     seed2 <- sprout(seed, 10)
-    
+
     expect_warning( sprout(seed2[[1]], 10)
                   , "RNG seed provided is already a substream seed, independence of streams not guaranteed."
                   )
@@ -139,7 +139,7 @@ test_that("reap parameter use.try", {
     x <- plant(list(rnorm), seed)[[1]]
     expect_silent(a <- reap(x, sample, use.try=TRUE))
     expect_is(a, "try-error")
-    
+
     expect_error(a <- reap(x, sample, use.try=FALSE))
 
     options(oo)
@@ -160,9 +160,9 @@ test_that("try_summary", {
         if(a < 0) stop("Sorry it failed.")
         "everything is good"
     }
-    
+
     b <- harvest(a, random_failure, use.try=TRUE)
-    
+
     expect_output( try_summary(b)
                  , "6 of 10 \\( 60%\\) calls produced errors"
                  )
@@ -177,7 +177,7 @@ test_that("plant something besides seeds", {
 test_that("branch", {
     x <- farm(gather(3, seed=20170825), rnorm(1))
     y <- 1:3
-    
+
     results <- branch(rnorm, x[[1]], y, n=100, time=TRUE)
     expect_is(results, "harvestr-results")
 })

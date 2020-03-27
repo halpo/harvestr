@@ -1,32 +1,31 @@
 {###############################################################################
 # test-caching.R
 # This file is part of the R package harvestr.
-# 
+#
 # Copyright 2012 Andrew Redd
 # Date: 6/2/2012
-# 
+#
 # DESCRIPTION
 # ===========
 # test the caching facilities.
-# 
+#
 # LICENSE
 # ========
 # harvestr is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software 
-# Foundation, either version 3 of the License, or (at your option) any later 
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
 # version.
-# 
-# dostats is distributed in the hope that it will be useful, but WITHOUT ANY 
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+#
+# This file is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along with 
-# dostats. If not, see http://www.gnu.org/licenses/.
-# 
+#
+# You should have received a copy of the GNU General Public License along with
+# this file If not, see http://www.gnu.org/licenses/.
+#
 }###############################################################################
 library(harvestr)
 library(testthat)
-library(dostats)
 library(boot)
 foreach::registerDoSEQ()
 context("Caching")
@@ -48,7 +47,7 @@ long_function <- function(){
 takes_at_least <-function (amount) {
     function(expr) {
         duration <- system.time(force(expr))["elapsed"]
-        expectation(duration > amount, 
+        expectation(duration > amount,
             sprintf("took %s seconds, which is more than %s", duration, amount))
     }
 }
@@ -67,20 +66,20 @@ test_that("caching in farm with mean of rnorm", {
     t2 <- system.time(run2 <- farm(seeds, mean(rnorm(5e6)), cache=TRUE, .progress='none', .parallel=FALSE))
     expect_true(all(t2[1] <= t1[1]))
     expect_identical(run1, run2)
-})  
+})
 test_that("caching in reap with long sample", {
     seed <- gather(1)
     unlink(cache.dir, recursive=TRUE, force=TRUE)
     dir.create(cache.dir, recursive=TRUE)
     expect_true(dir.exists(cache.dir))
-    long_sample <- compose(head, sample)
+    long_sample <- function(...)head(sample(...))
     x <- plant( list(5e7), seed)[[1]]
     hash <- digest(list(x, long_sample, source="harvestr::reap"), algo='md5')
-    
+
     t1 <- system.time(run1 <- reap(x, long_sample, hash=hash, cache=TRUE, time=FALSE))
     t2 <- system.time(run2 <- reap(x, long_sample, hash=hash, cache=TRUE, time=FALSE))
     expect_true(all(t2['user.self'] <= t1['user.self']), info="Rum time is faster in second call.")
-    expect_identical(run1, run2, info="Runs are identical.")    
+    expect_identical(run1, run2, info="Runs are identical.")
 
     unlink(cache.dir, recursive=TRUE, force=TRUE)
 })

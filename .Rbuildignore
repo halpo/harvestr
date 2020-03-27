@@ -10,3 +10,4 @@ libpeerconnection.log
 ^CONDUCT\.md$
 revdep
 ^README\.md$
+^.*\.Rproj$

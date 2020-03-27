@@ -1,50 +1,50 @@
 {###############################################################################
 # gather.R
 # This file is part of the R package harvestr.
-# 
+#
 # Copyright 2012 Andrew Redd
 # Date: 6/2/2012
-# 
+#
 # DESCRIPTION
 # ===========
 # Interface level functions that define the process flow.
 #
 # gather -> farm -> harvest
 # gather -> plant -> harvest
-# 
+#
 # LICENSE
 # ========
 # harvestr is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software 
-# Foundation, either version 3 of the License, or (at your option) any later 
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
 # version.
-# 
-# dostats is distributed in the hope that it will be useful, but WITHOUT ANY 
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+#
+# This file is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along with 
-# dostats. If not, see http://www.gnu.org/licenses/.
-# 
+#
+# You should have received a copy of the GNU General Public License along with
+# this file. If not, see http://www.gnu.org/licenses/.
+#
 }###############################################################################
 
 #' Gather independent seeds.
-#' 
+#'
 #' Collect seeds representing independent random number streams.
 #' These seeds can them be used in \code{\link{farm}} or \code{\link{plant}}.
-#' 
-#' 
+#'
+#'
 #' @param x number of seeds, or an object with seeds to gather
 #' @param seed a seed to use to set the seed, must be compatible with "L'Ecuyer-CMRG"
 #' @param ... passed on
 #' @param .starting if TRUE starting seeds with be gathered rather than ending seeds.
-#' 
+#'
 #' @seealso \link{RNG}
 #' @family harvest
 #' @importFrom parallel nextRNGStream
 #' @include withseed.R
 #' @export
-gather <- 
+gather <-
 function(x, seed=get.seed(), ..., .starting=F){
   oldseed <- get.seed()
   on.exit(replace.seed(oldseed))
@@ -62,7 +62,7 @@ function(x, seed=get.seed(), ..., .starting=F){
     seeds <- vector('list', x)
     for(i in seq_len(x)) {
         r <-
-        seeds[[i]] <-  
+        seeds[[i]] <-
             structure( nextRNGStream(r)
                      , RNGlevel='stream'
                      , class=c("rng-seed", "integer")
@@ -77,13 +77,13 @@ function(x, seed=get.seed(), ..., .starting=F){
 #' Create substreams of numbers based of a current stream.
 #'
 #' Seeds from \code{\link{gather}} can be used to generate another
-#' set of independent streams.  These seeds can be given to 
+#' set of independent streams.  These seeds can be given to
 #' \code{\link{graft}}
-#' 
-#' As a convenience \code{seed} can be an object that has a seed attached, 
+#'
+#' As a convenience \code{seed} can be an object that has a seed attached,
 #' ie. the result of any \code{harvestr} function.
-#' 
-#' @param seed a current random number stream compatible with 
+#'
+#' @param seed a current random number stream compatible with
 #'        \code{\link{nextRNGSubStream}}
 #' @param n number of new streams to create.
 #'
@@ -104,20 +104,20 @@ sprout <- function(seed, n) {
                           , class    = c('rng-seed', 'integer')
                           , RNGlevel = 'substream'
                           )
-    }) 
+    })
     structure(seeds, class=c('rng-seeds', 'list'))
 }
 
 #' Call a function continuing the random number stream.
-#' 
+#'
 #' The \code{reap} function is the central function to \code{harvest}.
-#' It takes an object, \code{x}, extracts the previous seed, ie. state of 
+#' It takes an object, \code{x}, extracts the previous seed, ie. state of
 #' the random number generator, sets the seed, and continues any evaluation.
 #' This creates a continuous random number stream, that is completly
 #' reproducible.
-#' 
+#'
 #' The function calling works the same as the \link{apply} family of functions.
-#' 
+#'
 #' @param x         an object
 #' @param fun       a function to call on object
 #' @param ...       passed onto function
@@ -126,7 +126,7 @@ sprout <- function(seed, n) {
 #' @param cache.dir directory for the cache.
 #' @param time      should results be timed?
 #' @param use.try   Should the call be wrapped in try?
-#' 
+#'
 #' @seealso \code{\link{withseed}}, \code{\link{harvest}}, and \code{\link{with}}
 #' @export
 reap <-
@@ -152,13 +152,13 @@ function( x, fun, ...
 }
 
 #' Evaluate an expression for a set of seeds.
-#' 
+#'
 #' For each seed, set the seed, then evaluate the expression.
 #' The \code{farm} function is used to generate data.
-#' The Seeds for the state of the random numbrer generator is stored in the 
+#' The Seeds for the state of the random numbrer generator is stored in the
 #' attribute \code{'ending.seed'}, and will be used by harvestr functions
 #' for any other random number generation that is needed.
-#' 
+#'
 #' @param seeds a list of seeds can be obtained though \code{\link{gather}}
 #' @param expr an expression to evalutate with the different seeds.
 #' @param envir an environment within which to evaluate \code{expr}.
@@ -167,7 +167,7 @@ function( x, fun, ...
 #' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
 #' @param .progress Show a progress bar?
-#' 
+#'
 #' @importFrom plyr llply ldply
 #' @family harvest
 #' @export
@@ -206,12 +206,12 @@ function( seeds, expr, envir = parent.frame(), ...
 #' @param time should results be timed?
 #' @param .parallel should the computations be run in parallel?
 #' @param .progress Show a progress bar?
-#' 
+#'
 #' @details
 #' harvest is functionaly equivalant to llply, but takes on additional capability when used
 #' with the other functions from this package.  When an object comes from \code{\link{withseed}}
 #' the ending seed is extacted and used to continue evaluation.
-#' 
+#'
 #' @importFrom plyr mlply
 #' @family harvest
 #' @export
@@ -253,11 +253,11 @@ try_summary <- function(results){
 #' @param seeds to plant from \code{\link{gather}} or \code{\link{sprout}}
 #'
 #' @description
-#' The function \code{plant} assigns 
+#' The function \code{plant} assigns
 #' each element in list set seed.
-#' This will replace and ending seeds values already set for the 
+#' This will replace and ending seeds values already set for the
 #' objects in the list.
-#' 
+#'
 #' @family harvest
 #' @export
 plant <-
@@ -282,17 +282,17 @@ function(.list
 
 #' @rdname plant
 #' @aliases graft
-#' 
+#'
 #' @description
 #' The \code{graft} function replicates an object with independent substreams.
 #' The result from \code{graft} should be used with \code{\link{harvest}}.
-#' 
+#'
 #' @param x an objects that already has seeds.
 #' @param n number of seeds to create
 #' @family harvest
 #' @export
 graft <-
-function(x, n, seeds = sprout(x, n)) 
+function(x, n, seeds = sprout(x, n))
     plant(replicate(length(seeds), x, F), seeds)
 
 
@@ -313,7 +313,7 @@ function( fun  #< function to apply to x and y[i]
     buds   <- graft(x, seeds=seeds)
     shoots <- t(mapply(list, x=buds, y, ..., SIMPLIFY=TRUE))
 
-    results <- 
+    results <-
         mlply( shoots, .fun=reap, fun=fun
              , time       = time
              , .parallel  = .parallel
@@ -326,21 +326,21 @@ function( fun  #< function to apply to x and y[i]
     structure( results
              , 'function' = 'harvestr::branch'
              , class = c('harvestr-results', 'list')
-             )    
-#TODO[Andrew]: Test branch    
+             )
+#TODO[Andrew]: Test branch
 }
-    
+
 #' Apply over rows of a data frame
-#' 
+#'
 #' @param df    a data frame of parameters
 #' @param f     a function
 #' @param ...   additional parameters
 #' @param seeds seeds to use.
 #' @param seed  passed to gather to generate seeds.
 #' @inheritParams harvest
-#' 
+#'
 #' @return a list with f applied to each row of df.
-#' 
+#'
 #' @importFrom plyr splat
 #' @export
 plow  <-
@@ -359,14 +359,14 @@ function( df, f, ...
 }
 
 #' Combine results into a data frame
-#' 
+#'
 #' @param l a list, from a harvestr function.
 #' @param .check should checks be run on the object.
-#' 
+#'
 #' @seealso ldply
-#' 
+#'
 #' @export
-bale <- 
+bale <-
 function(l, .check=T){
     if(.check){
         stopifnot( is_homo(l)
